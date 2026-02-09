@@ -20,16 +20,16 @@
   <div class="rail-scrim" id="railScrim" hidden></div>
 
   <aside class="side-rail" id="sideRail" aria-label="Primary navigation">
-    <button class="rail-btn" id="menuToggle" aria-expanded="false" aria-label="Toggle sidebar">
-      <img class="icon-open" src="assets/ui_burger.svg" alt="" aria-hidden="true" />
-      <img class="icon-close" src="assets/ui_close.svg" alt="" aria-hidden="true" />
-    </button>
+    <div class="rail-top">
+      <button class="rail-btn" id="menuToggle" aria-expanded="false" aria-label="Toggle sidebar">
+        <img class="icon-open" src="assets/ui_burger.svg" alt="" aria-hidden="true" />
+        <img class="icon-close" src="assets/ui_close.svg" alt="" aria-hidden="true" />
+      </button>
+    </div>
 
-    <span class="rail-title">SOUNDTRACK</span>
-
-    <nav class="rail-groups" aria-label="Chapter navigation">
+    <nav class="rail-nav rail-groups" aria-label="Chapter navigation">
       <section class="rail-group" data-chapter="intro">
-        <button class="rail-item is-active" data-target-index="0" data-chapter="intro">INTRO</button>
+        <button class="rail-item is-active" data-target-index="1" data-chapter="intro">INTRO</button>
         <div class="rail-subnav">
           <button class="rail-subitem" data-target-index="0">Landing</button>
           <button class="rail-subitem" data-target-index="1">Why I built this as a site</button>
@@ -75,6 +75,10 @@
         </div>
       </section>
     </nav>
+
+    <div class="rail-bottom">
+      <span class="rail-title">SOUNDTRACK</span>
+    </div>
   </aside>
 
   <main id="horizontalShell" class="horizontal-shell">
@@ -98,7 +102,7 @@
           </article>
 
           <figure class="hero-portrait parallax-soft" aria-hidden="true">
-            <img src="assets/gm_hero.webp" alt="" loading="eager" />
+            <img src="assets/gm_support_02.webp" alt="" loading="eager" />
           </figure>
         </div>
       </section>

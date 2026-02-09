@@ -100,6 +100,7 @@ iframe {
   font-size: 0.74rem;
   line-height: 1.5;
   letter-spacing: 0.01em;
+  pointer-events: none;
 }
 
 .debug-title {
@@ -144,6 +145,10 @@ body.rail-open .side-rail {
   width: var(--rail-expanded);
 }
 
+.rail-top {
+  flex: 0 0 auto;
+}
+
 .rail-btn {
   position: relative;
   width: 46px;
@@ -183,36 +188,39 @@ body.rail-open .rail-btn .icon-close {
   background: rgba(255, 255, 255, 0.18);
 }
 
+.rail-nav {
+  flex: 0 1 auto;
+}
+
+.rail-bottom {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
 .rail-title {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(180deg);
+  display: block;
+  transform: rotate(180deg);
   writing-mode: vertical-rl;
   text-transform: uppercase;
   letter-spacing: 0.42em;
   font-size: 0.67rem;
   font-weight: 700;
   opacity: 0.95;
-  transition: top 0.44s var(--ease), left 0.44s var(--ease), transform 0.44s var(--ease), letter-spacing 0.44s var(--ease);
+  transition: letter-spacing 0.3s var(--ease), font-size 0.3s var(--ease);
 }
 
 body.rail-open .rail-title {
-  top: 74px;
-  left: 26px;
-  transform: translate(0, 0);
-  writing-mode: horizontal-tb;
-  letter-spacing: 0.2em;
-  font-size: 0.72rem;
+  letter-spacing: 0.3em;
 }
 
 .rail-groups {
-  margin-top: 104px;
+  margin-top: 18px;
   width: 100%;
   display: grid;
   gap: 10px;
-  padding-right: 6px;
-  overflow-y: auto;
+  padding-right: 2px;
+  overflow: hidden;
 }
 
 .rail-group {
@@ -301,6 +309,9 @@ body.rail-open .rail-subnav {
 
 .horizontal-shell {
   position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   z-index: 20;
 }
 
@@ -308,7 +319,7 @@ body.rail-open .rail-subnav {
   display: flex;
   flex-wrap: nowrap;
   width: max-content;
-  height: 100vh;
+  height: 100%;
   will-change: transform;
 }
 
@@ -316,14 +327,14 @@ body.rail-open .rail-subnav {
   position: relative;
   width: 100vw;
   flex: 0 0 100vw;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
   padding: clamp(20px, 3.8vw, 56px) clamp(14px, 4.8vw, 74px) clamp(16px, 3.8vw, 48px) calc(var(--rail-collapsed) + clamp(10px, 1.9vw, 26px));
 }
 
 .panel-wide {
-  width: 120vw;
-  flex-basis: 120vw;
+  width: 100vw;
+  flex-basis: 100vw;
 }
 
 .panel::before {
@@ -431,8 +442,8 @@ body.rail-open .rail-subnav {
 
 .hero-portrait {
   margin: 0;
-  width: min(540px, 42vw);
-  height: min(82vh, 840px);
+  width: min(420px, 36vw);
+  aspect-ratio: 3 / 4.2;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.32);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.38);
@@ -456,9 +467,12 @@ body.rail-open .rail-subnav {
 
 .cover-collage img {
   position: absolute;
+  aspect-ratio: 1 / 1;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.34);
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.36);
+  object-fit: contain;
+  background: rgba(6, 7, 10, 0.44);
 }
 
 .cover-a {
@@ -893,8 +907,7 @@ body.native-horizontal .panel.is-visible .anim-line {
   }
 
   .hero-portrait {
-    width: min(460px, 62vw);
-    height: min(72vh, 640px);
+    width: min(360px, 62vw);
   }
 
   .panel-figure,
@@ -947,40 +960,6 @@ body.native-horizontal .panel.is-visible .anim-line {
   .cover-collage {
     width: 220px;
     height: 170px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html:focus-within {
-    scroll-behavior: auto;
-  }
-
-  .horizontal-track {
-    display: block;
-    width: 100%;
-    height: auto;
-    transform: none !important;
-    position: static !important;
-  }
-
-  .panel,
-  .panel-wide {
-    width: 100%;
-    flex-basis: 100%;
-    height: auto;
-    min-height: 100vh;
-  }
-
-  .panel-media,
-  .anim-card,
-  .anim-heading,
-  .anim-line,
-  .tick-five,
-  .parallax-soft,
-  .paper-card {
-    transform: none !important;
-    opacity: 1 !important;
-    clip-path: none !important;
   }
 }
 

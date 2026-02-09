@@ -23,6 +23,7 @@
   const parallaxItems = Array.from(document.querySelectorAll(".parallax-soft"));
   const paperCards = Array.from(document.querySelectorAll(".paper-card"));
   const heroPortrait = document.querySelector(".hero-portrait img");
+  const heroPortraitFrame = document.querySelector(".hero-portrait");
   const collageImages = Array.from(document.querySelectorAll(".cover-collage img, .sources-collage img"));
   const tickFive = document.getElementById("tickFive");
   const images = Array.from(document.querySelectorAll("img"));
@@ -113,7 +114,7 @@
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
   const collapsedRailWidth = () => (window.matchMedia("(max-width: 900px)").matches ? 76 : 92);
-  const expandedRailWidth = () => (window.matchMedia("(max-width: 900px)").matches ? Math.min(window.innerWidth * 0.88, 340) : 360);
+  const expandedRailWidth = () => (window.matchMedia("(max-width: 900px)").matches ? Math.min(window.innerWidth * 0.88, 320) : 320);
 
   const distanceX = () => Math.max(0, track.scrollWidth - window.innerWidth);
 
@@ -172,6 +173,8 @@
       "<div class=\"debug-line\"><span>motionMode</span><strong data-k=\"motion\">-</strong></div>",
       "<div class=\"debug-line\"><span>prefersReduced</span><strong data-k=\"prefers\">-</strong></div>",
       "<div class=\"debug-line\"><span>distanceX</span><strong data-k=\"distance\">-</strong></div>",
+      "<div class=\"debug-line\"><span>scrollY</span><strong data-k=\"scroll\">-</strong></div>",
+      "<div class=\"debug-line\"><span>trackW / innerW</span><strong data-k=\"widths\">-</strong></div>",
       "<div class=\"debug-line\"><span>GSAP/ST/Lenis</span><strong data-k=\"libs\">-</strong></div>"
     ].join("");
 
@@ -196,6 +199,8 @@
     set("motion", motionSetting);
     set("prefers", String(reduceQuery.matches));
     set("distance", String(distanceX()));
+    set("scroll", String(Math.round(window.scrollY)));
+    set("widths", `${Math.round(track.scrollWidth)} / ${Math.round(window.innerWidth)}`);
     set("libs", `${gsapOk}/${stOk}/${lenisOk}`);
   };
 
@@ -225,6 +230,12 @@
         () => {
           const holder = img.closest(".hero-portrait, .panel-figure, .cover-collage, .sources-collage");
           if (holder) {
+            if (holder.classList.contains("hero-portrait")) {
+              holder.style.display = "none";
+              img.style.display = "none";
+              return;
+            }
+
             holder.style.background = "linear-gradient(140deg, rgba(255,255,255,0.2), rgba(10,10,16,0.4))";
             holder.style.minHeight = "220px";
           }
@@ -241,6 +252,49 @@
         { once: true }
       );
     });
+  };
+
+  const waitForImages = async () => {
+    const decodeTasks = images.map((img) => {
+      if (!img.complete) {
+        if (img.loading === "lazy") {
+          return Promise.resolve();
+        }
+
+        return new Promise((resolve) => {
+          const timer = window.setTimeout(resolve, 800);
+          const done = () => {
+            window.clearTimeout(timer);
+            resolve();
+          };
+
+          img.addEventListener("load", done, { once: true });
+          img.addEventListener("error", done, { once: true });
+        });
+      }
+
+      if (typeof img.decode === "function") {
+        return img.decode().catch(() => {});
+      }
+
+      return Promise.resolve();
+    });
+
+    await Promise.allSettled(decodeTasks);
+  };
+
+  const tuneLandingMedia = () => {
+    if (!heroPortrait || !heroPortraitFrame) return;
+    const w = heroPortrait.naturalWidth || 0;
+    const h = heroPortrait.naturalHeight || 0;
+    if (!w || !h) return;
+
+    const ratio = w / h;
+    if (ratio < 1.1) {
+      heroPortraitFrame.style.aspectRatio = `${w} / ${h}`;
+    } else {
+      heroPortraitFrame.style.aspectRatio = "3 / 4.2";
+    }
   };
 
   const clearObserver = () => {
@@ -510,7 +564,7 @@
     body.classList.remove("reduced-motion");
 
     const initialDistance = distanceX();
-    if (initialDistance <= 2) {
+    if (initialDistance <= 8) {
       return false;
     }
 
@@ -550,7 +604,7 @@
     }
 
     masterTrigger = masterTween.scrollTrigger;
-    if (!masterTrigger || masterTrigger.end - masterTrigger.start <= 2) {
+    if (!masterTrigger || masterTrigger.end - masterTrigger.start <= 8) {
       killGsapHorizontal();
       return false;
     }
@@ -735,7 +789,7 @@
     }
 
     ScrollTrigger.refresh();
-    if (distanceX() <= 2) {
+    if (distanceX() <= 8) {
       killGsapHorizontal();
       return false;
     }
@@ -786,14 +840,16 @@
     if (Number.isNaN(idx)) return;
 
     if (engine === "gsap" && masterTrigger) {
-      const points = snapPoints();
-      const progress = points[idx] ?? 0;
-      const y = masterTrigger.start + (masterTrigger.end - masterTrigger.start) * progress;
+      const dist = Math.max(1, distanceX());
+      const targetX = clamp(panels[idx].offsetLeft, 0, dist);
+      const progress = targetX / dist;
+      const totalScroll = masterTrigger.end - masterTrigger.start;
+      const y = masterTrigger.start + totalScroll * progress;
 
       if (lenis) {
         lenis.scrollTo(y, { duration: 1.02 });
       } else {
-        window.scrollTo({ top: y, behavior: "smooth" });
+        window.scrollTo({ top: y, behavior: reducedMotion ? "auto" : "smooth" });
       }
       return;
     }
@@ -966,16 +1022,32 @@
     if (engine === "native" && nativeState.resizeHandler) {
       nativeState.resizeHandler();
     }
+
+    updateDebugOverlay();
   });
 
-  setupImageFallbacks();
+  const boot = async () => {
+    setupImageFallbacks();
 
-  motionSetting = resolveMotionSetting();
-  reducedMotion = computeReducedMotion();
-  ensureDebugOverlay();
+    motionSetting = resolveMotionSetting();
+    reducedMotion = computeReducedMotion();
+    ensureDebugOverlay();
 
-  setActiveNav(0);
-  updateProgressBar(0);
-  buildRailTimeline();
-  initializeEngine();
+    setActiveNav(0);
+    updateProgressBar(0);
+
+    await waitForImages();
+    tuneLandingMedia();
+
+    buildRailTimeline();
+    initializeEngine();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      boot();
+    }, { once: true });
+  } else {
+    boot();
+  }
 })();
