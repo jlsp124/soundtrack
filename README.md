@@ -22,12 +22,14 @@ Primary mode (GSAP available):
 - `ScrollTrigger` pins `#horizontalShell`.
 - The track translates on X from `0` to `-(scrollWidth - innerWidth)`.
 - Snap points are based on real panel offsets.
+- If GSAP initializes but `distanceX` is effectively zero, the app automatically falls back to native mode.
 
 Fallback mode (GSAP blocked/unavailable, motion ON):
 - Native horizontal engine is used.
 - `maxX = max(0, track.scrollWidth - innerWidth)`.
-- `shell.style.height = innerHeight + maxX`.
-- On vertical scroll, JS sets `track.style.transform = translate3d(-scrollY, 0, 0)` (clamped to `maxX`).
+- `body.style.height = innerHeight + maxX`.
+- `#horizontalShell` is fixed to the viewport.
+- On vertical scroll, JS sets `track.style.transform = translate3d(-scrollY, 0, 0)` (clamped to `maxX`) with rAF interpolation for smoother feel.
 
 Reduced mode (motion OFF or auto + prefers-reduced-motion):
 - Panels stack vertically.
@@ -53,6 +55,12 @@ Motion can be controlled in three ways:
 Default in this repo is:
 - `<body data-motion="on">`
 
+Behavior rules:
+- Motion is enabled by default (`on`) even if the browser reports reduced-motion.
+- Heavy animation is disabled only when:
+  - `motion=off`, or
+  - `motion=auto` and `prefers-reduced-motion` is true.
+
 ## CDN reliability strategy
 
 `index.html` uses a sequential loader before loading `script.js`:
@@ -70,6 +78,15 @@ Default in this repo is:
 `script.js` is loaded only after these attempts complete.
 If GSAP/ScrollTrigger still fail, native horizontal fallback mode is used automatically.
 
+## Debug mode
+
+Use `?debug=1` to display a live debug overlay showing:
+- active engine (`gsap`, `native`, `reduced`)
+- motion mode (`on/off/auto`)
+- `prefers-reduced-motion` state
+- computed `distanceX`
+- library availability flags (`GSAP / ScrollTrigger / Lenis`)
+
 ## Where to tweak feel/parallax
 
 File: `script.js`
@@ -83,6 +100,7 @@ File: `script.js`
 - `parallaxItems` animation (`xPercent`, `yPercent`)
 - `paperCards` drift (`yPercent`)
 - `updateNativeParallax()` values for native fallback mode
+- native interpolation smoothing inside `initNativeHorizontal()` render loop
 
 3. Lenis feel:
 - `initLenis()` -> `duration`, `lerp`, `wheelMultiplier`

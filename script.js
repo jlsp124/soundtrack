@@ -26,6 +26,7 @@
   const collageImages = Array.from(document.querySelectorAll(".cover-collage img, .sources-collage img"));
   const tickFive = document.getElementById("tickFive");
   const images = Array.from(document.querySelectorAll("img"));
+  const revealMedia = Array.from(document.querySelectorAll(".reveal-media"));
 
   if (!shell || !track || panels.length === 0) {
     return;
@@ -33,6 +34,7 @@
 
   const MOTION_KEY = "soundtrack.motion";
   const allowedMotion = new Set(["on", "off", "auto"]);
+  const debugEnabled = new URLSearchParams(window.location.search).get("debug") === "1";
 
   const reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -54,10 +56,14 @@
   const nativeState = {
     active: false,
     maxX: 0,
+    currentX: 0,
+    targetX: 0,
     scrollHandler: null,
     resizeHandler: null,
     raf: 0
   };
+
+  let debugNode = null;
 
   const safeStorageGet = (key) => {
     try {
@@ -153,6 +159,44 @@
     if (!progressFill) return;
     const value = clamp(progress, 0, 1);
     progressFill.style.transform = `scaleY(${value})`;
+  };
+
+  const ensureDebugOverlay = () => {
+    if (!debugEnabled || debugNode) return;
+
+    debugNode = document.createElement("aside");
+    debugNode.className = "debug-overlay";
+    debugNode.innerHTML = [
+      "<p class=\"debug-title\">Debug</p>",
+      "<div class=\"debug-line\"><span>engine</span><strong data-k=\"engine\">-</strong></div>",
+      "<div class=\"debug-line\"><span>motionMode</span><strong data-k=\"motion\">-</strong></div>",
+      "<div class=\"debug-line\"><span>prefersReduced</span><strong data-k=\"prefers\">-</strong></div>",
+      "<div class=\"debug-line\"><span>distanceX</span><strong data-k=\"distance\">-</strong></div>",
+      "<div class=\"debug-line\"><span>GSAP/ST/Lenis</span><strong data-k=\"libs\">-</strong></div>"
+    ].join("");
+
+    body.appendChild(debugNode);
+  };
+
+  const updateDebugOverlay = () => {
+    if (!debugEnabled) return;
+    ensureDebugOverlay();
+    if (!debugNode) return;
+
+    const gsapOk = !!window.gsap;
+    const stOk = !!window.ScrollTrigger;
+    const lenisOk = !!window.Lenis;
+
+    const set = (key, value) => {
+      const el = debugNode.querySelector(`[data-k="${key}"]`);
+      if (el) el.textContent = value;
+    };
+
+    set("engine", engine);
+    set("motion", motionSetting);
+    set("prefers", String(reduceQuery.matches));
+    set("distance", String(distanceX()));
+    set("libs", `${gsapOk}/${stOk}/${lenisOk}`);
   };
 
   const clearParallaxStyles = () => {
@@ -335,9 +379,11 @@
 
     nativeState.active = false;
     nativeState.maxX = 0;
+    nativeState.currentX = 0;
+    nativeState.targetX = 0;
 
     body.classList.remove("native-horizontal");
-    shell.style.height = "";
+    body.style.height = "";
     track.style.transform = "";
   };
 
@@ -393,21 +439,39 @@
 
     const updateMetrics = () => {
       nativeState.maxX = Math.max(0, track.scrollWidth - window.innerWidth);
-      shell.style.height = `${window.innerHeight + nativeState.maxX}px`;
+      body.style.height = `${window.innerHeight + nativeState.maxX}px`;
     };
 
     const render = () => {
       nativeState.raf = 0;
-      const y = clamp(window.scrollY, 0, nativeState.maxX);
-      track.style.transform = `translate3d(${-y}px, 0, 0)`;
+      nativeState.currentX += (nativeState.targetX - nativeState.currentX) * 0.14;
+      if (Math.abs(nativeState.targetX - nativeState.currentX) < 0.2) {
+        nativeState.currentX = nativeState.targetX;
+      }
 
-      const progress = nativeState.maxX > 0 ? y / nativeState.maxX : 0;
+      track.style.transform = `translate3d(${-nativeState.currentX}px, 0, 0)`;
+
+      const progress = nativeState.maxX > 0 ? nativeState.currentX / nativeState.maxX : 0;
       updateProgressBar(progress);
       setActiveNav(indexFromProgress(progress));
-      updateNativeParallax(y, nativeState.maxX);
+      updateNativeParallax(nativeState.currentX, nativeState.maxX);
+
+      panels.forEach((panel) => {
+        const left = panel.offsetLeft - nativeState.currentX;
+        const right = left + panel.offsetWidth;
+        const visible = right > window.innerWidth * 0.15 && left < window.innerWidth * 0.85;
+        panel.classList.toggle("is-visible", visible);
+      });
+
+      updateDebugOverlay();
+
+      if (Math.abs(nativeState.targetX - nativeState.currentX) > 0.2) {
+        nativeState.raf = window.requestAnimationFrame(render);
+      }
     };
 
     const requestRender = () => {
+      nativeState.targetX = clamp(window.scrollY, 0, nativeState.maxX);
       if (nativeState.raf) return;
       nativeState.raf = window.requestAnimationFrame(render);
     };
@@ -427,6 +491,8 @@
     engine = "native";
 
     requestRender();
+    console.log("[soundtrack] engine=native motion=%s distanceX=%d", motionSetting, nativeState.maxX);
+    updateDebugOverlay();
     return true;
   };
 
@@ -443,36 +509,52 @@
     detachVerticalProgress();
     body.classList.remove("reduced-motion");
 
-    gsap.registerPlugin(ScrollTrigger);
-    killGsapHorizontal();
-    clearParallaxStyles();
+    const initialDistance = distanceX();
+    if (initialDistance <= 2) {
+      return false;
+    }
 
-    masterTween = gsap.to(track, {
-      x: () => -distanceX(),
-      ease: "none",
-      scrollTrigger: {
-        id: "horizontal-master",
-        trigger: shell,
-        start: "top top",
-        end: () => `+=${distanceX()}`,
-        pin: true,
-        scrub: 0.92,
-        invalidateOnRefresh: true,
-        anticipatePin: 1,
-        snap: {
-          snapTo: (value) => gsap.utils.snap(snapPoints(), value),
-          duration: { min: 0.2, max: 0.62 },
-          ease: "power1.inOut",
-          inertia: false
-        },
-        onUpdate: (self) => {
-          updateProgressBar(self.progress);
-          setActiveNav(indexFromProgress(self.progress));
+    try {
+      gsap.registerPlugin(ScrollTrigger);
+      killGsapHorizontal();
+      clearParallaxStyles();
+
+      masterTween = gsap.to(track, {
+        x: () => -distanceX(),
+        ease: "none",
+        scrollTrigger: {
+          id: "horizontal-master",
+          trigger: shell,
+          start: "top top",
+          end: () => `+=${distanceX()}`,
+          pin: true,
+          scrub: 0.98,
+          invalidateOnRefresh: true,
+          anticipatePin: 1,
+          snap: {
+            snapTo: (value) => gsap.utils.snap(snapPoints(), value),
+            duration: { min: 0.2, max: 0.62 },
+            ease: "power1.inOut",
+            inertia: false
+          },
+          onUpdate: (self) => {
+            updateProgressBar(self.progress);
+            setActiveNav(indexFromProgress(self.progress));
+            updateDebugOverlay();
+          }
         }
-      }
-    });
+      });
+    } catch (_error) {
+      killGsapHorizontal();
+      return false;
+    }
 
     masterTrigger = masterTween.scrollTrigger;
+    if (!masterTrigger || masterTrigger.end - masterTrigger.start <= 2) {
+      killGsapHorizontal();
+      return false;
+    }
+
     initLenis();
 
     headings.forEach((heading, idx) => {
@@ -519,6 +601,24 @@
           toggleActions: "play none none reverse"
         }
       });
+    });
+
+    revealMedia.forEach((item) => {
+      gsap.fromTo(
+        item,
+        { clipPath: "inset(0 0 100% 0)" },
+        {
+          clipPath: "inset(0 0 0% 0)",
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: item.closest(".panel"),
+            containerAnimation: masterTween,
+            start: "left 70%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
     });
 
     mediaLayers.forEach((media, idx) => {
@@ -635,7 +735,14 @@
     }
 
     ScrollTrigger.refresh();
+    if (distanceX() <= 2) {
+      killGsapHorizontal();
+      return false;
+    }
+
     engine = "gsap";
+    console.log("[soundtrack] engine=gsap motion=%s distanceX=%d", motionSetting, distanceX());
+    updateDebugOverlay();
     return true;
   };
 
@@ -652,6 +759,8 @@
 
     setActiveNav(0);
     engine = "reduced";
+    console.log("[soundtrack] engine=reduced motion=%s distanceX=%d", motionSetting, distanceX());
+    updateDebugOverlay();
   };
 
   const initializeEngine = () => {
@@ -668,6 +777,8 @@
     if (!gsapReady) {
       initNativeHorizontal();
     }
+
+    updateDebugOverlay();
   };
 
   const jumpToPanel = (rawIndex) => {
@@ -843,6 +954,8 @@
       window.gsap.set(sideRail, { width: expandedRailWidth() });
       window.gsap.set(subItems, { autoAlpha: 1, y: 0 });
     }
+
+    updateDebugOverlay();
   });
 
   window.addEventListener("load", () => {
@@ -859,6 +972,7 @@
 
   motionSetting = resolveMotionSetting();
   reducedMotion = computeReducedMotion();
+  ensureDebugOverlay();
 
   setActiveNav(0);
   updateProgressBar(0);

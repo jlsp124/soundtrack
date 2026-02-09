@@ -1,6 +1,6 @@
 :root {
   --rail-collapsed: 92px;
-  --rail-expanded: 360px;
+  --rail-expanded: 320px;
   --font-display: "Bebas Neue", sans-serif;
   --font-serif: "Bodoni Moda", serif;
   --font-body: "Inter", sans-serif;
@@ -82,6 +82,38 @@ iframe {
   transform-origin: bottom;
   transform: scaleY(0);
   background: linear-gradient(180deg, #23d5ff 0%, #7847ff 52%, #ff3cac 100%);
+}
+
+.debug-overlay {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 210;
+  width: min(340px, 92vw);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(10, 12, 18, 0.82);
+  backdrop-filter: blur(8px);
+  color: #f5f7ff;
+  padding: 10px 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+
+.debug-title {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  opacity: 0.86;
+}
+
+.debug-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .rail-scrim {
@@ -286,7 +318,7 @@ body.rail-open .rail-subnav {
   flex: 0 0 100vw;
   height: 100vh;
   overflow: hidden;
-  padding: clamp(22px, 4vw, 62px) clamp(14px, 5vw, 84px) clamp(18px, 4vw, 52px) calc(var(--rail-collapsed) + clamp(18px, 3.8vw, 54px));
+  padding: clamp(20px, 3.8vw, 56px) clamp(14px, 4.8vw, 74px) clamp(16px, 3.8vw, 48px) calc(var(--rail-collapsed) + clamp(10px, 1.9vw, 26px));
 }
 
 .panel-wide {
@@ -384,8 +416,8 @@ body.rail-open .rail-subnav {
 .split-content {
   min-height: 84vh;
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: clamp(18px, 3vw, 40px);
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(14px, 2.2vw, 32px);
   align-items: center;
 }
 
@@ -514,7 +546,7 @@ body.rail-open .rail-subnav {
 
 .intro-block {
   max-width: min(880px, 88vw);
-  min-height: 74vh;
+  min-height: 66vh;
   display: grid;
   align-content: start;
   gap: 8px;
@@ -602,7 +634,7 @@ body.rail-open .rail-subnav {
 }
 
 .spotify-large {
-  width: min(660px, 84vw);
+  width: min(680px, 86vw);
 }
 
 .spotify-card {
@@ -665,7 +697,7 @@ body.rail-open .rail-subnav {
 }
 
 .compare-wrap {
-  width: min(860px, 88vw);
+  width: min(760px, 86vw);
   background: rgba(255, 255, 255, 0.82);
   color: #11131a;
   border-radius: 14px;
@@ -673,11 +705,66 @@ body.rail-open .rail-subnav {
   padding: clamp(18px, 2.4vw, 34px);
 }
 
-.only-bullets {
-  margin: 8px 0 0;
-  padding-left: 20px;
-  display: grid;
-  gap: 8px;
+.compare-wrap p {
+  margin: 0;
+}
+
+.gm-intro-layout {
+  align-items: end;
+}
+
+.chapter-support {
+  justify-self: end;
+  width: min(420px, 34vw);
+}
+
+.chapter-support img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reveal-media {
+  clip-path: inset(0 0 100% 0);
+}
+
+.together-layout {
+  align-items: center;
+}
+
+.together-collage {
+  margin: 0;
+  position: relative;
+  width: min(410px, 34vw);
+  height: 300px;
+}
+
+.together-collage img {
+  position: absolute;
+  border-radius: 10px;
+  border: 1px solid rgba(20, 21, 29, 0.18);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.2);
+}
+
+.together-a {
+  width: 170px;
+  left: 0;
+  bottom: 0;
+  transform: rotate(-5deg);
+}
+
+.together-b {
+  width: 170px;
+  right: 20px;
+  top: 0;
+  transform: rotate(6deg);
+}
+
+.together-c {
+  width: 220px;
+  right: 0;
+  bottom: 6px;
+  transform: rotate(-2deg);
 }
 
 .reflection-wrap {
@@ -768,14 +855,33 @@ body.rail-open .rail-subnav {
 }
 
 body.native-horizontal .horizontal-shell {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
 }
 
 body.native-horizontal .horizontal-track {
-  position: sticky;
+  position: absolute;
   top: 0;
   left: 0;
   height: 100vh;
+}
+
+body.native-horizontal .panel .anim-card,
+body.native-horizontal .panel .anim-heading,
+body.native-horizontal .panel .anim-line {
+  opacity: 0.01;
+  transform: translate3d(0, 26px, 0);
+  transition: opacity 0.44s var(--ease), transform 0.52s var(--ease);
+}
+
+body.native-horizontal .panel.is-visible .anim-card,
+body.native-horizontal .panel.is-visible .anim-heading,
+body.native-horizontal .panel.is-visible .anim-line {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
 }
 
 @media (max-width: 1140px) {
@@ -793,15 +899,21 @@ body.native-horizontal .horizontal-track {
 
   .panel-figure,
   .panel-figure.wide,
-  .sources-collage {
+  .sources-collage,
+  .together-collage {
     width: min(380px, 58vw);
+  }
+
+  .chapter-support {
+    justify-self: start;
+    width: min(360px, 58vw);
   }
 }
 
 @media (max-width: 900px) {
   :root {
     --rail-collapsed: 76px;
-    --rail-expanded: min(88vw, 340px);
+    --rail-expanded: min(88vw, 320px);
   }
 
   .panel,
