@@ -1,65 +1,96 @@
-﻿# My Personal Soundtrack Website
+# My Personal Soundtrack Website
 
 Static GitHub Pages site built with:
 - `index.html`
 - `styles.css`
 - `script.js`
-- GSAP + ScrollTrigger (CDN)
-- Lenis smooth scrolling (CDN)
+- GSAP + ScrollTrigger (CDN with fallback)
+- Lenis smooth scroll (CDN with fallback)
 
 ## Run locally
 
 1. Open the repo folder in VS Code.
 2. Run Live Server on `index.html`.
-3. Test desktop and mobile breakpoints.
-4. Test reduced-motion mode in OS/browser accessibility settings.
+3. Open desktop Chrome and test normal scroll input.
+4. Confirm scrolling down moves the story horizontally.
 
-## How horizontal scroll works
+## How horizontal mode works
 
-- `#horizontalShell` is pinned by ScrollTrigger.
-- `#horizontalTrack` is translated on the X axis.
-- User scrolls down normally; content moves horizontally through panels.
-- Scroll distance is computed from:
-  - `track.scrollWidth - window.innerWidth`
-- Panel snap is gentle and based on real panel offsets.
+The page uses a horizontal track (`#horizontalTrack`) inside a shell (`#horizontalShell`).
 
-## How Lenis is integrated
+Primary mode (GSAP available):
+- `ScrollTrigger` pins `#horizontalShell`.
+- The track translates on X from `0` to `-(scrollWidth - innerWidth)`.
+- Snap points are based on real panel offsets.
 
-- Lenis runs only when:
-  - reduced motion is not active,
-  - `body[data-lenis]` is not `off`,
-  - Lenis/GSAP/ScrollTrigger are available.
-- Lenis and ScrollTrigger are synced via `lenis.on('scroll', ScrollTrigger.update)` and GSAP ticker.
-- If Lenis fails or is unavailable, scrolling falls back to native browser scroll.
+Fallback mode (GSAP blocked/unavailable, motion ON):
+- Native horizontal engine is used.
+- `maxX = max(0, track.scrollWidth - innerWidth)`.
+- `shell.style.height = innerHeight + maxX`.
+- On vertical scroll, JS sets `track.style.transform = translate3d(-scrollY, 0, 0)` (clamped to `maxX`).
 
-### Disable Lenis
+Reduced mode (motion OFF or auto + prefers-reduced-motion):
+- Panels stack vertically.
+- Heavy transforms and parallax are disabled.
 
-Set this in `index.html`:
+## Motion override
 
-```html
-<body data-lenis="off">
-```
+Motion can be controlled in three ways:
 
-## Tuning scrub and snap
+1. Query param (highest priority):
+- `?motion=on`
+- `?motion=off`
+- `?motion=auto`
+
+2. Body attribute in `index.html`:
+- `<body data-motion="on">`
+- `<body data-motion="off">`
+- `<body data-motion="auto">`
+
+3. Saved preference:
+- Query param value is persisted in `localStorage` key `soundtrack.motion`.
+
+Default in this repo is:
+- `<body data-motion="on">`
+
+## CDN reliability strategy
+
+`index.html` uses a sequential loader before loading `script.js`:
+
+- GSAP:
+  - jsDelivr first
+  - cdnjs fallback
+- ScrollTrigger:
+  - jsDelivr first
+  - cdnjs fallback
+- Lenis:
+  - jsDelivr first
+  - unpkg fallback
+
+`script.js` is loaded only after these attempts complete.
+If GSAP/ScrollTrigger still fail, native horizontal fallback mode is used automatically.
+
+## Where to tweak feel/parallax
 
 File: `script.js`
 
-Inside `initHorizontal()` master ScrollTrigger:
-- `scrub: 0.85` controls smoothing feel.
-- `snap.duration` controls snap speed.
-- `snapTo` uses `snapPoints()` (panel offsets) for panel-by-panel snapping.
+1. Horizontal smoothness and snap:
+- `initGsapHorizontal()` -> `scrub` in master `ScrollTrigger`
+- `snap.duration` range
+
+2. Parallax intensity:
+- `mediaLayers` animation (`xPercent`, `scale`)
+- `parallaxItems` animation (`xPercent`, `yPercent`)
+- `paperCards` drift (`yPercent`)
+- `updateNativeParallax()` values for native fallback mode
+
+3. Lenis feel:
+- `initLenis()` -> `duration`, `lerp`, `wheelMultiplier`
 
 ## Reduced-motion behavior
 
-- On `prefers-reduced-motion: reduce`:
-  - Lenis is disabled.
-  - heavy transforms/animations are disabled.
-  - horizontal track falls back to vertical stacked panels.
-  - navigation still jumps to each section.
-
-## Assets
-
-Required assets and recommended dimensions are listed in:
-- `assets/README_ASSETS.txt`
-
-Keep filenames exact for GitHub Pages compatibility.
+When reduced mode is active:
+- Lenis is disabled.
+- GSAP horizontal engine is not used.
+- Layout switches to vertical stack via `.reduced-motion` styles.
+- Navigation and progress bar continue working.

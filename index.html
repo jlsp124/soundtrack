@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
   <meta charset="UTF-8" />
@@ -10,87 +10,108 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bodoni+Moda:opsz,wght@6..96,600;6..96,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body data-lenis="on">
+<body data-lenis="on" data-motion="on">
   <div class="grain-overlay" aria-hidden="true"></div>
 
-  <aside class="side-rail" aria-label="Primary navigation">
-    <button class="rail-btn" id="menuToggle" aria-expanded="false" aria-controls="menuDrawer" aria-label="Open menu">
-      <img src="assets/ui_burger.svg" alt="" aria-hidden="true" />
+  <div class="edge-progress" aria-hidden="true">
+    <span class="edge-progress-fill" id="edgeProgressFill"></span>
+  </div>
+
+  <div class="rail-scrim" id="railScrim" hidden></div>
+
+  <aside class="side-rail" id="sideRail" aria-label="Primary navigation">
+    <button class="rail-btn" id="menuToggle" aria-expanded="false" aria-label="Toggle sidebar">
+      <img class="icon-open" src="assets/ui_burger.svg" alt="" aria-hidden="true" />
+      <img class="icon-close" src="assets/ui_close.svg" alt="" aria-hidden="true" />
     </button>
 
     <span class="rail-title">SOUNDTRACK</span>
 
-    <nav class="rail-nav" aria-label="Chapters">
-      <button class="rail-item is-active" data-target-index="0" data-chapter="intro">INTRO</button>
-      <button class="rail-item" data-target-index="2" data-chapter="good-morning">GOOD MORNING</button>
-      <button class="rail-item" data-target-index="8" data-chapter="take-five">TAKE FIVE</button>
-      <button class="rail-item" data-target-index="15" data-chapter="reflection">REFLECTION</button>
-      <button class="rail-item" data-target-index="16" data-chapter="sources">SOURCES</button>
+    <nav class="rail-groups" aria-label="Chapter navigation">
+      <section class="rail-group" data-chapter="intro">
+        <button class="rail-item is-active" data-target-index="0" data-chapter="intro">INTRO</button>
+        <div class="rail-subnav">
+          <button class="rail-subitem" data-target-index="0">Landing</button>
+          <button class="rail-subitem" data-target-index="1">Why I built this as a site</button>
+        </div>
+      </section>
+
+      <section class="rail-group" data-chapter="good-morning">
+        <button class="rail-item" data-target-index="2" data-chapter="good-morning">GOOD MORNING</button>
+        <div class="rail-subnav">
+          <button class="rail-subitem" data-target-index="2">Chapter intro</button>
+          <button class="rail-subitem" data-target-index="3">Spotify</button>
+          <button class="rail-subitem" data-target-index="4">Why this song?</button>
+          <button class="rail-subitem" data-target-index="5">What does it push me toward?</button>
+          <button class="rail-subitem" data-target-index="6">Valedictorian lyric</button>
+          <button class="rail-subitem" data-target-index="7">How does it represent me right now?</button>
+        </div>
+      </section>
+
+      <section class="rail-group" data-chapter="take-five">
+        <button class="rail-item" data-target-index="8" data-chapter="take-five">TAKE FIVE</button>
+        <div class="rail-subnav">
+          <button class="rail-subitem" data-target-index="8">Chapter intro</button>
+          <button class="rail-subitem" data-target-index="9">Spotify</button>
+          <button class="rail-subitem" data-target-index="10">Why this piece?</button>
+          <button class="rail-subitem" data-target-index="11">How can no words say so much?</button>
+          <button class="rail-subitem" data-target-index="12">Different without trying too hard</button>
+          <button class="rail-subitem" data-target-index="13">Now or future?</button>
+          <button class="rail-subitem" data-target-index="14">Why these two together?</button>
+        </div>
+      </section>
+
+      <section class="rail-group" data-chapter="reflection">
+        <button class="rail-item" data-target-index="15" data-chapter="reflection">REFLECTION</button>
+        <div class="rail-subnav">
+          <button class="rail-subitem" data-target-index="15">Unit reflection</button>
+        </div>
+      </section>
+
+      <section class="rail-group" data-chapter="sources">
+        <button class="rail-item" data-target-index="16" data-chapter="sources">SOURCES</button>
+        <div class="rail-subnav">
+          <button class="rail-subitem" data-target-index="16">Links</button>
+        </div>
+      </section>
     </nav>
-  </aside>
-
-  <div class="menu-scrim" id="menuScrim" hidden></div>
-
-  <aside class="menu-drawer" id="menuDrawer" aria-label="Section drawer">
-    <div class="drawer-head">
-      <p class="drawer-kicker">My Personal Soundtrack</p>
-      <button class="rail-btn" id="menuClose" aria-label="Close menu">
-        <img src="assets/ui_close.svg" alt="" aria-hidden="true" />
-      </button>
-    </div>
-
-    <div class="drawer-links">
-      <button class="drawer-link" data-target-index="0">Landing</button>
-      <button class="drawer-link" data-target-index="1">Why I built this as a site</button>
-      <button class="drawer-link" data-target-index="2">Good Morning chapter intro</button>
-      <button class="drawer-link" data-target-index="3">Good Morning Spotify</button>
-      <button class="drawer-link" data-target-index="4">Why this song?</button>
-      <button class="drawer-link" data-target-index="5">What does it push me toward?</button>
-      <button class="drawer-link" data-target-index="6">Valedictorian lyric panel</button>
-      <button class="drawer-link" data-target-index="7">How does it represent me right now?</button>
-      <button class="drawer-link" data-target-index="8">Take Five chapter intro</button>
-      <button class="drawer-link" data-target-index="9">Take Five Spotify</button>
-      <button class="drawer-link" data-target-index="10">Why this piece?</button>
-      <button class="drawer-link" data-target-index="11">How can a song with no words say so much?</button>
-      <button class="drawer-link" data-target-index="12">What makes it different without trying too hard?</button>
-      <button class="drawer-link" data-target-index="13">Does it match how I live now?</button>
-      <button class="drawer-link" data-target-index="14">Why these two songs together?</button>
-      <button class="drawer-link" data-target-index="15">Unit reflection</button>
-      <button class="drawer-link" data-target-index="16">Sources</button>
-    </div>
   </aside>
 
   <main id="horizontalShell" class="horizontal-shell">
     <div id="horizontalTrack" class="horizontal-track">
 
-      <section class="panel panel-wide theme-bw-dark panel-landing" id="section-0" data-index="0" data-chapter="intro" style="--bg-image:url('assets/gm_hero.webp')">
-        <div class="panel-media media-hero"></div>
+      <section class="panel panel-wide theme-bw-dark panel-landing" id="section-0" data-index="0" data-chapter="intro">
         <div class="panel-content hero-split">
           <article class="hero-text anim-card">
-            <p class="micro-label">CLE 10 | Personal Identity + Music</p>
+            <p class="micro-label">CLE 10</p>
             <h1 class="hero-title anim-heading">
               <span>MY PERSONAL</span>
               <span>SOUNDTRACK</span>
             </h1>
-            <p class="name-line">Jovan</p>
+            <p class="name-line">By Jovan</p>
             <p class="hero-tagline">Two songs, one direction: keep growing while staying original in subtle ways.</p>
+
+            <div class="cover-collage parallax-soft" aria-hidden="true">
+              <img class="cover-a" src="assets/cover_graduation.webp" alt="" loading="lazy" />
+              <img class="cover-b" src="assets/cover_timeout.webp" alt="" loading="lazy" />
+            </div>
           </article>
 
-          <figure class="hero-figure parallax-soft" aria-hidden="true">
-            <img src="assets/gm_support_01.webp" alt="" loading="lazy" />
+          <figure class="hero-portrait parallax-soft" aria-hidden="true">
+            <img src="assets/gm_hero.webp" alt="" loading="eager" />
           </figure>
         </div>
       </section>
 
-      <section class="panel theme-bw-light panel-intro" id="section-1" data-index="1" data-chapter="intro">
-        <div class="panel-content prose-block anim-card">
+      <section class="panel theme-bw-dark panel-intro" id="section-1" data-index="1" data-chapter="intro">
+        <div class="panel-content prose-block intro-block anim-card">
           <p class="micro-label">Intro</p>
           <h2 class="section-title anim-heading">Why I built this as a site</h2>
           <p>
-            Making this project as a website let me express two messages from the songs I chose. Good Morning feels like a fresh start - the kind of energy that pushes you to get up and improve. Take Five shows another side of me: doing something different in a way that still feels natural and high-quality, not different just to be loud.
+            Making this project as a website let me express two messages from the songs I chose. Good Morning feels like a fresh start, the kind of energy that pushes me to get up and improve. Take Five shows another side of me: doing something different in a way that still feels natural and high-quality, not different just to be loud.
           </p>
           <p>
-            Building a site also matches how I like to create. I am a fast learner who thinks outside the box, and for you as my teacher, this format shows not just what songs I picked but how I think through choices and effort behind the final result.
+            Building a site also matches how I like to create. I am a fast learner who thinks outside the box, and this format lets me show both the ideas and the choices behind how I present them.
           </p>
         </div>
       </section>
@@ -109,34 +130,25 @@
       </section>
 
       <section class="panel theme-gm panel-spotify-gm" id="section-3" data-index="3" data-chapter="good-morning">
-        <div class="panel-content spotify-wrap anim-card">
+        <div class="panel-content spotify-wrap spotify-centered anim-card">
           <p class="spotify-label">Spotify &mdash; Non-explicit version</p>
-          <div class="spotify-layout">
-            <div class="spotify-card">
-              <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/5MTwfuYDZqRIEwOAamaT2I?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-            </div>
-            <figure class="panel-figure cover-figure parallax-soft" aria-hidden="true">
-              <img src="assets/cover_graduation.webp" alt="" loading="lazy" />
-            </figure>
+          <div class="spotify-card spotify-large">
+            <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/5MTwfuYDZqRIEwOAamaT2I?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
           </div>
         </div>
       </section>
 
-      <section class="panel theme-gm panel-gm-why" id="section-4" data-index="4" data-chapter="good-morning" style="--bg-image:url('assets/gm_support_01.webp')">
-        <div class="panel-media media-gm-support"></div>
-        <div class="panel-content split-content">
+      <section class="panel theme-gm panel-gm-why" id="section-4" data-index="4" data-chapter="good-morning">
+        <div class="panel-content centered-card">
           <article class="paper-card anim-card">
             <h3 class="question-title anim-heading">Why this song?</h3>
             <p>
-              I chose Good Morning by Kanye West from the album Graduation (2007), a hip-hop track with a confident but uplifting sound. It’s upbeat and makes me feel like I should get up and do something. What stands out to me is that it opens the album with a fresh start feeling, and it introduces the graduation idea as more than school - it’s about moving into a new level of growth. That opening-chapter energy connects to how I think about improving: you don’t wait to feel ready, you start moving and you become better through the work.
+              I chose Good Morning by Kanye West from the album Graduation (2007), a hip-hop track with a confident but uplifting sound. It is upbeat and makes me feel like I should get up and do something. What stands out to me is that it opens the album with a fresh start feeling, and it introduces the graduation idea as more than school: it is about moving into a new level of growth.
             </p>
             <p>
               Kanye is known for blending personal ambition with bold production choices, and this opener sets that tone clearly.
             </p>
           </article>
-          <figure class="panel-figure parallax-soft" aria-hidden="true">
-            <img src="assets/gm_support_01.webp" alt="" loading="lazy" />
-          </figure>
         </div>
       </section>
 
@@ -149,41 +161,42 @@
           <article class="paper-card anim-card">
             <h3 class="question-title anim-heading">What does it push me toward?</h3>
             <p>
-              Good Morning really makes me strive to be better. I like having a goal in front of me and doing what I can to reach it. The message I take from it is not just “be successful,” but “keep improving.” It’s about building momentum and becoming the best version of yourself through consistency, not luck.
-            </p>
-            <p>
-              As a fast learner, that momentum matters because it helps me move from overthinking into action.
+              Good Morning really makes me strive to be better. I like having a goal in front of me and doing what I can to reach it. The message I take from it is not just "be successful," but "keep improving." It is about building momentum and becoming the best version of myself through consistency, not luck.
             </p>
           </article>
         </div>
       </section>
 
-      <section class="panel theme-gm panel-gm-lyric" id="section-6" data-index="6" data-chapter="good-morning">
-        <div class="panel-content lyric-panel anim-card">
-          <p class="lyric-giant anim-heading">"Good morning, look at the valedictorian."</p>
-          <p>
-            This line stands out to me because I don’t take valedictorian as only a school thing. To me it represents a better version of myself that I’m trying to reach. It connects to my values of growth and uniqueness - pushing to improve, but doing it in my own way.
-          </p>
-          <p>
-            I also know I sometimes procrastinate by thinking too long instead of starting. This lyric feels like a wake-up call: stop waiting, start now, and earn the version of yourself I’m aiming for.
-          </p>
-          <div class="accent-line-wrap" aria-hidden="true">
-            <span class="accent-line line-a anim-line"></span>
-            <span class="accent-line line-b anim-line"></span>
-          </div>
+      <section class="panel theme-gm panel-gm-lyric" id="section-6" data-index="6" data-chapter="good-morning" style="--bg-image:url('assets/gm_hero.webp')">
+        <div class="panel-media media-gm-lyric"></div>
+        <div class="panel-content centered-card">
+          <article class="paper-card quote-card anim-card">
+            <p class="lyric-giant anim-heading">"Good morning, look at the valedictorian."</p>
+            <p>
+              This line stands out to me because I do not take valedictorian as only a school thing. To me it represents a better version of myself that I am trying to reach. It connects to my values of growth and uniqueness, pushing to improve while still doing it in my own way.
+            </p>
+            <p>
+              I also know I sometimes procrastinate by overthinking instead of starting. This lyric feels like a wake-up call: stop waiting, start now, and earn the version of myself I am aiming for.
+            </p>
+          </article>
         </div>
       </section>
 
       <section class="panel theme-gm panel-gm-now" id="section-7" data-index="7" data-chapter="good-morning">
-        <div class="panel-content prose-card anim-card">
-          <h3 class="question-title anim-heading">How does it represent me right now?</h3>
-          <p>
-            This song reflects me now because I’m focused on growing and building consistency so that my future is easier and stronger. I don’t want improvement to be random - I want it to be something I build. Good Morning matches that mindset because it feels like choosing momentum on purpose.
-          </p>
+        <div class="panel-content split-content">
+          <figure class="panel-figure parallax-soft" aria-hidden="true">
+            <img src="assets/gm_support_01.webp" alt="" loading="lazy" />
+          </figure>
+          <article class="paper-card anim-card">
+            <h3 class="question-title anim-heading">How does it represent me right now?</h3>
+            <p>
+              This song reflects me now because I am focused on growing and building consistency so my future is easier and stronger. I do not want improvement to be random. I want it to be something I build on purpose. Good Morning matches that mindset because it feels like choosing momentum every day.
+            </p>
+          </article>
         </div>
       </section>
 
-      <section class="panel panel-wide theme-transition panel-tf-intro" id="section-8" data-index="8" data-chapter="take-five" style="--bg-image:url('assets/tf_hero.webp')">
+      <section class="panel panel-wide theme-tf-intro panel-tf-intro" id="section-8" data-index="8" data-chapter="take-five" style="--bg-image:url('assets/tf_hero.webp')">
         <div class="panel-media media-tf"></div>
         <div class="panel-content chapter-intro tf-chapter anim-card">
           <p class="chapter-kicker">CHAPTER 02</p>
@@ -197,9 +210,9 @@
       </section>
 
       <section class="panel theme-tf panel-spotify-tf" id="section-9" data-index="9" data-chapter="take-five">
-        <div class="panel-content spotify-wrap anim-card">
+        <div class="panel-content spotify-wrap spotify-centered anim-card">
           <p class="spotify-label tf-label">Spotify embed</p>
-          <div class="spotify-card paper-card">
+          <div class="spotify-card spotify-large tf-spotify-card">
             <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/1YQWosTIljIvxAgHWTp7KP?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
           </div>
         </div>
@@ -211,7 +224,7 @@
           <article class="paper-card anim-card">
             <h3 class="question-title anim-heading">Why this piece?</h3>
             <p>
-              I chose Take Five by The Dave Brubeck Quartet. It’s often described as cool jazz from the Time Out era (1959). The piece uses an unusual 5/4 time signature, which is even referenced in its name. What’s interesting is that it still feels smooth and clean - it doesn’t sound weird just because it’s different. The difference is subtle, and that’s what makes it so good.
+              I chose Take Five by The Dave Brubeck Quartet. It is often described as cool jazz from the Time Out era (1959). The piece uses an unusual 5/4 time signature, which is referenced in its name. What is interesting is that it still feels smooth and clean. It does not sound weird just because it is different.
             </p>
             <p>
               The group is known for exploring unusual time signatures, and this piece is one of the clearest examples of that approach.
@@ -225,23 +238,26 @@
 
       <section class="panel theme-tf panel-tf-words" id="section-11" data-index="11" data-chapter="take-five" style="--bg-image:url('assets/tf_support_02.webp')">
         <div class="panel-media media-tf-support"></div>
-        <div class="panel-content prose-card paper-card anim-card">
-          <h3 class="question-title anim-heading">How can a song with no words say so much?</h3>
-          <p>
-            Take Five has a big message to me, even though it has no lyrics. It’s unique, but that uniqueness doesn’t make it awkward to listen to. It feels high-quality and controlled, but not robotic - it still has personality. It sounds disciplined, but it still feels full and alive. That balance is something I respect.
-          </p>
+        <div class="panel-content centered-card">
+          <article class="paper-card anim-card">
+            <h3 class="question-title anim-heading">How can a song with no words say so much?</h3>
+            <p>
+              Take Five has a big message to me, even though it has no lyrics. It is unique, but that uniqueness does not make it awkward to listen to. It feels high-quality and controlled, but not robotic. It still has personality. It sounds disciplined, but it still feels full and alive. That balance is something I respect.
+            </p>
+          </article>
         </div>
       </section>
 
-      <section class="panel theme-tf panel-tf-diff" id="section-12" data-index="12" data-chapter="take-five">
-        <div class="panel-content split-content reverse">
+      <section class="panel theme-tf panel-tf-diff" id="section-12" data-index="12" data-chapter="take-five" style="--bg-image:url('assets/tf_support_02.webp')">
+        <div class="panel-media media-tf-support"></div>
+        <div class="panel-content centered-card diff-center">
           <article class="paper-card anim-card">
             <h3 class="question-title anim-heading">What makes it different without trying too hard?</h3>
             <p>
-              It actually took me a long time to notice that this piece was in 5/4 and not 4/4. Even so, you can still tell there’s something special about it when you listen - you feel the difference before you can explain it.
+              It actually took me a long time to notice that this piece was in 5/4 and not 4/4. Even so, I could still hear that something about it was different before I could explain why.
             </p>
             <p>
-              That represents how I like to do things differently. I think outside the box, but I don’t want to add a bunch of extra things just to impress people. I’d rather use the tools I have intentionally and make a few details really strong. I like staying within what still feels normal, but adding something that makes it quietly stand out.
+              That represents how I like to do things differently. I do not want to add extra details just to impress people. I would rather use the tools I have intentionally and make a few details really strong. I like staying within what still feels normal, while adding something that makes it quietly stand out.
             </p>
             <div class="ticks-row" aria-label="5 over 4 reveal">
               <span class="tick"></span>
@@ -251,28 +267,27 @@
               <span class="tick tick-five" id="tickFive"></span>
             </div>
           </article>
-          <figure class="panel-figure parallax-soft" aria-hidden="true">
-            <img src="assets/cover_timeout.webp" alt="" loading="lazy" />
-          </figure>
         </div>
       </section>
 
       <section class="panel theme-tf panel-tf-now" id="section-13" data-index="13" data-chapter="take-five">
-        <div class="panel-content prose-card paper-card anim-card">
-          <h3 class="question-title anim-heading">Does it match how I live now, or who I want to be?</h3>
-          <p>
-            This song represents how I live right now. I appreciate originality that’s subtle and thoughtful, and I try to do things differently for a reason - not just to be different. Take Five proves you can stand out without being messy, and that’s the kind of creativity I want in my own work.
-          </p>
+        <div class="panel-content centered-card">
+          <article class="paper-card anim-card">
+            <h3 class="question-title anim-heading">Does it match how I live now, or who I want to be?</h3>
+            <p>
+              This song represents how I live right now. I appreciate originality that is subtle and thoughtful, and I try to do things differently for a reason, not just to be different. Take Five proves you can stand out without being messy, and that is the kind of creativity I want in my own work.
+            </p>
+          </article>
         </div>
       </section>
 
-      <section class="panel theme-tf panel-together" id="section-14" data-index="14" data-chapter="take-five">
-        <div class="panel-content prose-card paper-card anim-card">
+      <section class="panel theme-bw-light panel-together" id="section-14" data-index="14" data-chapter="take-five">
+        <div class="panel-content compare-wrap anim-card">
           <h3 class="question-title anim-heading">Why these two songs together?</h3>
           <ul class="only-bullets">
-            <li>Good Morning is my “momentum” song &mdash; growth, fresh starts, and pushing forward.</li>
-            <li>Take Five is my “quiet originality” song &mdash; different, but controlled and high-quality.</li>
-            <li>One uses lyrics to make the message obvious; the other uses structure to make you feel it.</li>
+            <li>Good Morning is my "momentum" song - growth, fresh starts, and pushing forward.</li>
+            <li>Take Five is my "quiet originality" song - different, but controlled and high-quality.</li>
+            <li>One uses lyrics to make the message obvious; the other uses structure to make me feel it.</li>
             <li>Together they describe how I want to grow: improve constantly, but stay original.</li>
           </ul>
         </div>
@@ -281,30 +296,86 @@
       <section class="panel theme-bw-dark panel-reflection" id="section-15" data-index="15" data-chapter="reflection">
         <div class="panel-content reflection-wrap anim-card">
           <h3 class="section-title anim-heading">Unit reflection</h3>
-          <p class="prompt-line">What did this project teach me about my identity and values?</p>
-          <p class="prompt-line">How did music help me describe myself more clearly than normal writing?</p>
-          <p class="prompt-line">How do I want to apply growth + subtle originality in the future?</p>
-          <textarea class="reflection-pad" placeholder="Write reflection notes here..."></textarea>
+          <p class="reflection-placeholder">(Essay will be added here)</p>
+          <div class="reflection-blank" aria-hidden="true"></div>
         </div>
       </section>
 
       <section class="panel theme-bw-light panel-sources" id="section-16" data-index="16" data-chapter="sources">
-        <div class="panel-content sources-wrap anim-card">
-          <h3 class="section-title anim-heading">Sources</h3>
-          <a href="https://open.spotify.com/track/5MTwfuYDZqRIEwOAamaT2I" target="_blank" rel="noreferrer">Spotify - Good Morning (non-explicit)</a>
-          <a href="https://open.spotify.com/track/1YQWosTIljIvxAgHWTp7KP" target="_blank" rel="noreferrer">Spotify - Take Five</a>
-          <a href="https://en.wikipedia.org/wiki/Good_Morning_(Kanye_West_song)" target="_blank" rel="noreferrer">Song information - Good Morning</a>
-          <a href="https://en.wikipedia.org/wiki/Take_Five" target="_blank" rel="noreferrer">Song information - Take Five</a>
-          <a href="https://en.wikipedia.org/wiki/Time_Out_(The_Dave_Brubeck_Quartet_album)" target="_blank" rel="noreferrer">Album context - Time Out</a>
+        <div class="panel-content sources-grid anim-card">
+          <div class="sources-links">
+            <h3 class="section-title anim-heading">Sources</h3>
+            <a href="https://open.spotify.com/track/5MTwfuYDZqRIEwOAamaT2I" target="_blank" rel="noreferrer">Spotify - Good Morning (non-explicit)</a>
+            <a href="https://open.spotify.com/track/1YQWosTIljIvxAgHWTp7KP" target="_blank" rel="noreferrer">Spotify - Take Five</a>
+            <a href="https://en.wikipedia.org/wiki/Good_Morning_(Kanye_West_song)" target="_blank" rel="noreferrer">Song information - Good Morning</a>
+            <a href="https://en.wikipedia.org/wiki/Take_Five" target="_blank" rel="noreferrer">Song information - Take Five</a>
+            <a href="https://en.wikipedia.org/wiki/Time_Out_(The_Dave_Brubeck_Quartet_album)" target="_blank" rel="noreferrer">Album context - Time Out</a>
+          </div>
+
+          <figure class="sources-collage parallax-soft" aria-hidden="true">
+            <img class="src-a" src="assets/cover_graduation.webp" alt="" loading="lazy" />
+            <img class="src-b" src="assets/cover_timeout.webp" alt="" loading="lazy" />
+            <img class="src-c" src="assets/tf_support_02.webp" alt="" loading="lazy" />
+          </figure>
         </div>
       </section>
 
     </div>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js" defer></script>
-  <script src="script.js" defer></script>
+  <script>
+    (function () {
+      function loadScript(src) {
+        return new Promise(function (resolve, reject) {
+          var script = document.createElement("script");
+          script.src = src;
+          script.async = false;
+          script.onload = function () { resolve(src); };
+          script.onerror = function () { reject(new Error("Failed to load " + src)); };
+          document.head.appendChild(script);
+        });
+      }
+
+      async function loadWithFallback(urls, required) {
+        for (var i = 0; i < urls.length; i += 1) {
+          try {
+            await loadScript(urls[i]);
+            return true;
+          } catch (_error) {
+            // try next source
+          }
+        }
+
+        if (required) {
+          throw new Error("All CDNs failed for required library.");
+        }
+
+        return false;
+      }
+
+      (async function bootstrap() {
+        try {
+          await loadWithFallback([
+            "https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/gsap.min.js"
+          ], true);
+
+          await loadWithFallback([
+            "https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/ScrollTrigger.min.js"
+          ], true);
+
+          await loadWithFallback([
+            "https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js",
+            "https://unpkg.com/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"
+          ], false);
+        } catch (_error) {
+          // script.js still runs and activates native horizontal fallback mode.
+        }
+
+        await loadScript("./script.js");
+      })();
+    })();
+  </script>
 </body>
 </html>
