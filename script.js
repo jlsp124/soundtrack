@@ -5,107 +5,81 @@
 
   const shell = document.getElementById("horizontalShell");
   const track = document.getElementById("horizontalTrack");
-  const sections = Array.from(document.querySelectorAll(".panel"));
+  const panels = Array.from(document.querySelectorAll(".panel"));
 
   const menuToggle = document.getElementById("menuToggle");
   const menuClose = document.getElementById("menuClose");
-  const menuPanel = document.getElementById("menuPanel");
   const menuScrim = document.getElementById("menuScrim");
-  const imageNodes = Array.from(document.querySelectorAll("img"));
 
   const railLinks = Array.from(document.querySelectorAll(".rail-link"));
   const menuLinks = Array.from(document.querySelectorAll(".menu-link"));
   const jumpButtons = Array.from(document.querySelectorAll("[data-target-index]"));
+  const splitLines = Array.from(document.querySelectorAll(".split-reveal span"));
+  const listenCards = Array.from(document.querySelectorAll(".listen-card"));
+  const images = Array.from(document.querySelectorAll("img"));
 
-  const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-  let reducedMotion = motionQuery.matches;
-
-  imageNodes.forEach((img) => {
-    img.addEventListener(
-      "error",
-      () => {
-        const visualHost = img.closest(".visual-quote, .cover-item");
-        if (visualHost) {
-          visualHost.classList.add("asset-fallback");
-        }
-
-        const lineHost = img.closest(".transition-lines");
-        if (lineHost) {
-          lineHost.classList.add("line-fallback");
-        }
-
-        const railHost = img.closest(".rail-button");
-        if (railHost && !railHost.querySelector(".icon-fallback")) {
-          railHost.textContent = "";
-          const fallback = document.createElement("span");
-          fallback.className = "icon-fallback";
-          fallback.setAttribute("aria-hidden", "true");
-          fallback.textContent = "+";
-          railHost.appendChild(fallback);
-        }
-
-        const cueHost = img.closest(".scroll-cue");
-        if (cueHost) {
-          cueHost.classList.add("wave-fallback");
-          if (!cueHost.querySelector(".wave-text")) {
-            cueHost.textContent = "";
-            const cueText = document.createElement("span");
-            cueText.className = "wave-text";
-            cueText.textContent = "SCROLL";
-            cueHost.appendChild(cueText);
-          }
-        }
-
-        img.style.display = "none";
-      },
-      { once: true }
-    );
-  });
-
-  if (reducedMotion) {
-    body.classList.add("reduced-motion");
-  }
+  const mediaQueryReduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let reducedMotion = mediaQueryReduce.matches;
 
   let masterTween = null;
   let masterTrigger = null;
-  let menuStagger = null;
-  let verticalObserver = null;
+  let menuTween = null;
+  let sectionObserver = null;
+  let lenis = null;
+  let lenisTicker = null;
 
-  const chapterByIndex = (index) => {
-    if (index <= 7) return "good-morning";
-    if (index <= 13) return "take-five";
-    if (index === 14) return "reflection";
+  const chapterForIndex = (index) => {
+    if (index <= 1) return "intro";
+    if (index <= 8) return "good-morning";
+    if (index <= 15) return "take-five";
+    if (index === 16) return "reflection";
     return "sources";
   };
 
-  const setActiveState = (index) => {
-    const chapter = chapterByIndex(index);
-
-    railLinks.forEach((button) => {
-      button.classList.toggle("is-active", button.dataset.chapter === chapter);
-    });
-
-    menuLinks.forEach((button) => {
-      const target = Number(button.dataset.targetIndex);
-      button.classList.toggle("is-current", target === index);
-    });
+  const setActiveChapter = (index) => {
+    const chapter = chapterForIndex(index);
+    railLinks.forEach((btn) => btn.classList.toggle("is-active", btn.dataset.chapter === chapter));
+    menuLinks.forEach((btn) => btn.classList.toggle("is-current", Number(btn.dataset.targetIndex) === index));
   };
 
-  const clampIndex = (index) => Math.min(sections.length - 1, Math.max(0, index));
+  const getDistance = () => Math.max(0, track.scrollWidth - window.innerWidth);
 
-  const jumpToSection = (rawIndex) => {
+  const panelProgressPoints = () => {
+    const distance = getDistance() || 1;
+    return panels.map((panel) => Math.min(1, panel.offsetLeft / distance));
+  };
+
+  const panelIndexFromProgress = (progress) => {
+    const points = panelProgressPoints();
+    let idx = 0;
+    points.forEach((point, i) => {
+      if (progress + 0.001 >= point) {
+        idx = i;
+      }
+    });
+    return idx;
+  };
+
+  const clampIndex = (index) => Math.max(0, Math.min(panels.length - 1, index));
+
+  const jumpToPanel = (rawIndex) => {
     const index = clampIndex(Number(rawIndex));
-
     if (Number.isNaN(index)) return;
 
     if (reducedMotion || !masterTrigger) {
-      sections[index]?.scrollIntoView({ behavior: "smooth", block: "start" });
+      panels[index]?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
 
-    const progress = index / (sections.length - 1);
-    const y = masterTrigger.start + (masterTrigger.end - masterTrigger.start) * progress;
-    window.scrollTo({ top: y, behavior: "smooth" });
+    const points = panelProgressPoints();
+    const targetProgress = points[index] ?? 0;
+    const y = masterTrigger.start + (masterTrigger.end - masterTrigger.start) * targetProgress;
+
+    if (lenis) {
+      lenis.scrollTo(y, { immediate: false, duration: 1.05 });
+    } else {
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
   };
 
   const openMenu = () => {
@@ -114,20 +88,20 @@
     if (menuScrim) menuScrim.hidden = false;
 
     if (window.gsap && !reducedMotion) {
-      if (menuStagger) menuStagger.kill();
-      window.gsap.set(menuLinks, { y: 22, autoAlpha: 0 });
-      menuStagger = window.gsap.to(menuLinks, {
+      if (menuTween) menuTween.kill();
+      window.gsap.set(menuLinks, { y: 20, autoAlpha: 0 });
+      menuTween = window.gsap.to(menuLinks, {
         y: 0,
         autoAlpha: 1,
-        duration: 0.56,
-        ease: "power3.out",
+        duration: 0.48,
         stagger: 0.05,
-        delay: 0.16
+        ease: "power3.out",
+        delay: 0.14
       });
     } else {
-      menuLinks.forEach((button) => {
-        button.style.opacity = "1";
-        button.style.transform = "translateY(0)";
+      menuLinks.forEach((link) => {
+        link.style.opacity = "1";
+        link.style.transform = "translateY(0)";
       });
     }
   };
@@ -142,36 +116,106 @@
     }, 420);
   };
 
-  const setupVerticalObserver = () => {
-    if (verticalObserver) {
-      verticalObserver.disconnect();
-    }
+  const setupListenCards = () => {
+    listenCards.forEach((card) => {
+      const btn = card.querySelector(".listen-toggle");
+      if (!btn) return;
 
-    verticalObserver = new IntersectionObserver(
+      btn.addEventListener("click", () => {
+        const isOpen = card.classList.toggle("is-open");
+        btn.setAttribute("aria-expanded", String(isOpen));
+      });
+    });
+  };
+
+  const setupImageFallbacks = () => {
+    images.forEach((img) => {
+      img.addEventListener(
+        "error",
+        () => {
+          const mediaCard = img.closest(".media-card, .cover-shot");
+          if (mediaCard) {
+            mediaCard.style.background = "linear-gradient(140deg, rgba(255,255,255,0.2), rgba(12,12,18,0.35))";
+            mediaCard.style.minHeight = "220px";
+          }
+
+          const railBtn = img.closest(".rail-btn");
+          if (railBtn) {
+            railBtn.textContent = "=";
+            railBtn.style.fontSize = "1.2rem";
+            railBtn.style.color = "#fff";
+          }
+
+          img.style.display = "none";
+        },
+        { once: true }
+      );
+    });
+  };
+
+  const setupVerticalObserver = () => {
+    if (sectionObserver) sectionObserver.disconnect();
+
+    sectionObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const index = Number(entry.target.dataset.index || "0");
-            setActiveState(index);
+            const idx = Number(entry.target.dataset.index || 0);
+            setActiveChapter(idx);
           }
         });
       },
-      {
-        threshold: 0.58
-      }
+      { threshold: 0.55 }
     );
 
-    sections.forEach((section) => verticalObserver.observe(section));
+    panels.forEach((panel) => sectionObserver.observe(panel));
+  };
+
+  const killLenis = () => {
+    if (!window.gsap) return;
+    if (lenisTicker) {
+      window.gsap.ticker.remove(lenisTicker);
+      lenisTicker = null;
+    }
+    if (lenis) {
+      lenis.destroy();
+      lenis = null;
+    }
+  };
+
+  const initLenis = () => {
+    if (body.dataset.lenis === "off" || reducedMotion || !window.Lenis || !window.gsap || !window.ScrollTrigger) {
+      killLenis();
+      return;
+    }
+
+    killLenis();
+
+    lenis = new window.Lenis({
+      duration: 1.1,
+      wheelMultiplier: 1,
+      lerp: 0.12,
+      smoothWheel: true,
+      smoothTouch: false,
+      gestureOrientation: "vertical"
+    });
+
+    lenis.on("scroll", () => window.ScrollTrigger.update());
+
+    lenisTicker = (time) => {
+      lenis.raf(time * 1000);
+    };
+
+    window.gsap.ticker.add(lenisTicker);
+    window.gsap.ticker.lagSmoothing(0);
   };
 
   const killHorizontal = () => {
-    if (!window.ScrollTrigger || !window.gsap) return;
-
+    if (!window.gsap || !window.ScrollTrigger) return;
     if (masterTween) {
       masterTween.kill();
       masterTween = null;
     }
-
     window.ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     window.gsap.set(track, { clearProps: "transform" });
     masterTrigger = null;
@@ -180,191 +224,89 @@
   const initHorizontal = () => {
     if (!window.gsap || !window.ScrollTrigger || reducedMotion) {
       body.classList.add("reduced-motion");
+      killHorizontal();
+      killLenis();
       setupVerticalObserver();
       return;
     }
 
     body.classList.remove("reduced-motion");
 
-    if (verticalObserver) {
-      verticalObserver.disconnect();
-      verticalObserver = null;
+    if (sectionObserver) {
+      sectionObserver.disconnect();
+      sectionObserver = null;
     }
 
     const gsap = window.gsap;
     const ScrollTrigger = window.ScrollTrigger;
+
     gsap.registerPlugin(ScrollTrigger);
 
-    const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
+    killHorizontal();
 
     masterTween = gsap.to(track, {
-      x: () => -distance(),
+      x: () => -getDistance(),
       ease: "none",
       scrollTrigger: {
-        id: "master-horizontal",
+        id: "masterHorizontal",
         trigger: shell,
         start: "top top",
-        end: () => `+=${distance()}`,
+        end: () => `+=${getDistance()}`,
         pin: true,
-        scrub: 0.95,
+        scrub: 0.88,
         invalidateOnRefresh: true,
         anticipatePin: 1,
+        snap: {
+          snapTo: (value) => gsap.utils.snap(panelProgressPoints(), value),
+          duration: { min: 0.18, max: 0.55 },
+          ease: "power1.inOut",
+          inertia: false
+        },
         onUpdate: (self) => {
-          const current = Math.round(self.progress * (sections.length - 1));
-          setActiveState(current);
+          const idx = panelIndexFromProgress(self.progress);
+          setActiveChapter(idx);
         }
       }
     });
 
     masterTrigger = masterTween.scrollTrigger;
 
+    initLenis();
+
     gsap.to(".scroll-cue", {
-      y: 8,
-      duration: 1.4,
+      y: 5,
+      duration: 1.35,
       ease: "sine.inOut",
       yoyo: true,
       repeat: -1
     });
 
-    gsap.fromTo(
-      ".hero-media",
-      { xPercent: 0, scale: 1.02 },
-      {
-        xPercent: -16,
-        scale: 1.15,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#section-0",
-          containerAnimation: masterTween,
-          start: "left right",
-          end: "right left",
-          scrub: true
+    gsap.utils.toArray(".panel-media").forEach((media, i) => {
+      gsap.fromTo(
+        media,
+        { xPercent: 0, scale: 1.02 },
+        {
+          xPercent: i % 2 === 0 ? -10 : 10,
+          scale: 1.1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: media.closest(".panel"),
+            containerAnimation: masterTween,
+            start: "left right",
+            end: "right left",
+            scrub: true
+          }
         }
-      }
-    );
-
-    gsap.utils.toArray(".panel-media").forEach((media, index) => {
-      if (media.classList.contains("hero-media")) return;
-      gsap.to(media, {
-        xPercent: index % 2 ? 9 : -9,
-        scale: 1.1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: media.closest(".panel"),
-          containerAnimation: masterTween,
-          start: "left right",
-          end: "right left",
-          scrub: true
-        }
-      });
+      );
     });
 
-    gsap.fromTo(
-      "#gmMainWord",
-      { xPercent: 36, scale: 1.15 },
-      {
-        xPercent: 0,
-        scale: 1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#section-2",
-          containerAnimation: masterTween,
-          start: "left 86%",
-          end: "center center",
-          scrub: true
-        }
-      }
-    );
-
-    gsap.to("#gmMainWord", {
-      scale: 0.45,
-      xPercent: -55,
-      yPercent: -40,
-      transformOrigin: "left top",
-      ease: "none",
-      scrollTrigger: {
-        trigger: "#section-2",
-        containerAnimation: masterTween,
-        start: "center center",
-        end: "right center",
-        scrub: true
-      }
-    });
-
-    gsap.fromTo(
-      "#gmCorner",
-      { autoAlpha: 0, y: 20 },
-      {
-        autoAlpha: 1,
-        y: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#section-2",
-          containerAnimation: masterTween,
-          start: "center center",
-          end: "right center",
-          scrub: true
-        }
-      }
-    );
-
-    gsap.fromTo(
-      "#tfMainWord",
-      { xPercent: 24, scale: 1.1 },
-      {
-        xPercent: 0,
-        scale: 1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#section-8",
-          containerAnimation: masterTween,
-          start: "left 90%",
-          end: "center center",
-          scrub: true
-        }
-      }
-    );
-
-    gsap.to("#tfMainWord", {
-      scale: 0.48,
-      xPercent: -48,
-      yPercent: -35,
-      transformOrigin: "left top",
-      ease: "none",
-      scrollTrigger: {
-        trigger: "#section-8",
-        containerAnimation: masterTween,
-        start: "center 58%",
-        end: "right 42%",
-        scrub: true
-      }
-    });
-
-    gsap.fromTo(
-      "#tfCorner",
-      { autoAlpha: 0, y: 16 },
-      {
-        autoAlpha: 1,
-        y: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#section-8",
-          containerAnimation: masterTween,
-          start: "center center",
-          end: "right center",
-          scrub: true
-        }
-      }
-    );
-
-    gsap.utils.toArray(".morph-line").forEach((line) => {
+    splitLines.forEach((line) => {
       gsap.from(line, {
         clipPath: "inset(0 100% 0 0)",
-        x: 44,
-        scaleX: 1.06,
+        x: 36,
         autoAlpha: 0,
-        duration: 1.12,
-        ease: "power3.out",
+        duration: 0.85,
+        ease: "power2.out",
         scrollTrigger: {
           trigger: line.closest(".panel"),
           containerAnimation: masterTween,
@@ -374,14 +316,14 @@
       });
     });
 
-    gsap.utils.toArray(".text-card, .text-block, .resource-copy").forEach((block) => {
-      gsap.from(block, {
-        y: 40,
+    gsap.utils.toArray(".info-card, .listen-card, .prose-block, .resources-wrap").forEach((el) => {
+      gsap.from(el, {
+        y: 28,
         autoAlpha: 0,
-        duration: 0.78,
+        duration: 0.72,
         ease: "power2.out",
         scrollTrigger: {
-          trigger: block.closest(".panel"),
+          trigger: el.closest(".panel"),
           containerAnimation: masterTween,
           start: "left 76%",
           toggleActions: "play none none reverse"
@@ -392,10 +334,10 @@
     gsap.from(".line-left", {
       xPercent: -120,
       autoAlpha: 0,
-      duration: 1.18,
+      duration: 1.05,
       ease: "power3.out",
       scrollTrigger: {
-        trigger: "#section-7",
+        trigger: "#section-8",
         containerAnimation: masterTween,
         start: "left 68%",
         toggleActions: "play none none reverse"
@@ -405,26 +347,12 @@
     gsap.from(".line-right", {
       xPercent: 120,
       autoAlpha: 0,
-      duration: 1.18,
+      duration: 1.05,
       ease: "power3.out",
       scrollTrigger: {
-        trigger: "#section-7",
+        trigger: "#section-8",
         containerAnimation: masterTween,
         start: "left 68%",
-        toggleActions: "play none none reverse"
-      }
-    });
-
-    gsap.from(".transition-stats .stat", {
-      y: 24,
-      autoAlpha: 0,
-      duration: 0.72,
-      stagger: 0.1,
-      ease: "power3.out",
-      scrollTrigger: {
-        trigger: "#section-7",
-        containerAnimation: masterTween,
-        start: "left 64%",
         toggleActions: "play none none reverse"
       }
     });
@@ -434,21 +362,21 @@
       scale: 1,
       ease: "none",
       scrollTrigger: {
-        trigger: "#section-11",
+        trigger: "#section-13",
         containerAnimation: masterTween,
-        start: "left 56%",
+        start: "left 58%",
         end: "center center",
         scrub: true
       }
     });
 
-    gsap.to(".cover-a", {
-      xPercent: -15,
-      yPercent: -12,
-      rotate: -2,
+    gsap.to(".cover-shot:first-child", {
+      xPercent: -14,
+      yPercent: -10,
+      rotate: -1.5,
       ease: "none",
       scrollTrigger: {
-        trigger: "#section-15",
+        trigger: "#section-17",
         containerAnimation: masterTween,
         start: "left right",
         end: "right left",
@@ -456,13 +384,13 @@
       }
     });
 
-    gsap.to(".cover-b", {
-      xPercent: 15,
-      yPercent: 13,
-      rotate: 2,
+    gsap.to(".cover-shot:last-child", {
+      xPercent: 14,
+      yPercent: 12,
+      rotate: 1.6,
       ease: "none",
       scrollTrigger: {
-        trigger: "#section-15",
+        trigger: "#section-17",
         containerAnimation: masterTween,
         start: "left right",
         end: "right left",
@@ -473,13 +401,11 @@
     ScrollTrigger.refresh();
   };
 
-  jumpButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const target = Number(button.dataset.targetIndex || "0");
-      jumpToSection(target);
-      if (body.classList.contains("menu-open")) {
-        closeMenu();
-      }
+  jumpButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = Number(btn.dataset.targetIndex || 0);
+      jumpToPanel(target);
+      if (body.classList.contains("menu-open")) closeMenu();
     });
   });
 
@@ -488,25 +414,27 @@
   menuScrim?.addEventListener("click", closeMenu);
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && body.classList.contains("menu-open")) {
-      closeMenu();
-    }
+    if (event.key === "Escape" && body.classList.contains("menu-open")) closeMenu();
   });
 
-  motionQuery.addEventListener("change", (event) => {
+  mediaQueryReduce.addEventListener("change", (event) => {
     reducedMotion = event.matches;
-
     if (reducedMotion) {
       body.classList.add("reduced-motion");
-      killHorizontal();
-      setupVerticalObserver();
     } else {
       body.classList.remove("reduced-motion");
-      initHorizontal();
+    }
+    initHorizontal();
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.ScrollTrigger) {
+      window.ScrollTrigger.refresh();
     }
   });
 
-  setActiveState(0);
+  setupImageFallbacks();
+  setupListenCards();
+  setActiveChapter(0);
   initHorizontal();
 })();
-

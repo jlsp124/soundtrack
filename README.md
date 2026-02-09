@@ -1,6 +1,6 @@
-﻿# My Personal Soundtrack Project (CLE 10)
+﻿# My Personal Soundtrack Project - V2
 
-Single-page, horizontal-scrolling narrative website built with vanilla HTML/CSS/JS + GSAP ScrollTrigger.
+Cinematic single-page website for CLE 10 using vanilla HTML/CSS/JS with GSAP ScrollTrigger horizontal storytelling.
 
 ## Project structure
 
@@ -11,21 +11,22 @@ Single-page, horizontal-scrolling narrative website built with vanilla HTML/CSS/
   script.js
   README.md
   /assets
+    README_ASSETS.txt
+    ...image files
 ```
 
-## Local run (VSCode Live Server)
+## Run locally
 
-1. Open this folder in VSCode.
-2. Right-click `site/index.html`.
-3. Click `Open with Live Server`.
-4. Test both desktop and mobile viewport sizes.
+1. Open the folder in VS Code.
+2. Start Live Server on `site/index.html`.
+3. Test desktop + mobile breakpoints.
+4. Test with reduced motion enabled in OS/browser settings.
 
-## Deploy to GitHub Pages (no build step)
+## Deploy to GitHub Pages
 
-GitHub Pages branch settings only allow `/` or `/docs`, so for this `/site` structure use GitHub Actions:
+### Option A (recommended for `/site` folder): GitHub Actions
 
-1. Push this project to GitHub.
-2. In your repo, create `.github/workflows/pages.yml` with this content:
+Create `.github/workflows/pages.yml`:
 
 ```yaml
 name: Deploy static site
@@ -60,63 +61,73 @@ jobs:
         uses: actions/deploy-pages@v4
 ```
 
-3. Go to `Settings > Pages` and set source to `GitHub Actions`.
-4. Push to `main` and wait for deployment.
+Then set `Settings > Pages > Source` to `GitHub Actions`.
 
-## Asset checklist (exact filenames)
+### Option B
 
-Place these in `site/assets/`:
+If you want branch deployment without Actions, move `site/*` to repo root or `/docs`.
 
-### Backgrounds
-- `gm_hero.webp` (recommended 2200x1400)
-- `gm_support_01.webp` (recommended 1800x1200)
-- `gm_support_02.webp` (recommended 1800x1200)
-- `tf_hero.webp` (recommended 2200x1400)
-- `tf_support_01.webp` (recommended 1800x1200)
-- `tf_support_02.webp` (recommended 1800x1200)
+## Where to put images
 
-### Covers
-- `cover_graduation.webp` (recommended 1200x1200)
-- `cover_timeout.webp` (recommended 1200x1200)
+Put all images inside `site/assets/`.
 
-### Textures
-- `tex_grain.png` (recommended tile 512x512 or 1024x1024)
-- `tex_paper.jpg` (recommended 1800x1200)
-- `tex_dust.png` (optional, recommended 1920x1080)
+Reference list and recommended sizes are documented in:
+- `site/assets/README_ASSETS.txt`
 
-### UI / motifs
-- `ui_burger.svg`
-- `ui_close.svg`
-- `ui_wave.svg`
-- `motif_slash.svg`
-- `motif_5beats.svg`
-- `motif_line.svg`
+## Horizontal scrolling setup (how it works)
 
-## Adjust section widths and ScrollTrigger values
+- `script.js` pins `#horizontalShell`.
+- `#horizontalTrack` translates on X while user scrolls down.
+- Each panel is `100vw`; selected hero panels use `120vw` (`.panel-wide`).
+- ScrollTrigger `snap` is enabled with custom points for gentle panel-to-panel snapping.
+- Lenis smooth scrolling runs only when:
+  - browser supports it,
+  - reduced motion is not active,
+  - `body[data-lenis]` is not set to `off`.
 
-### Section widths
-- File: `site/styles.css`
-- Main width rule:
+## Tuning guide
+
+### Panel widths
+
+File: `site/styles.css`
+
+- Base panel width:
   - `.panel { width: 100vw; flex: 0 0 100vw; }`
-- To make scenes longer/shorter horizontally, adjust panel width to values like `110vw` or `90vw` for selected panels.
+- Wide hero panels:
+  - `.panel-wide { width: 120vw; flex: 0 0 120vw; }`
 
-### Horizontal scroll distance
-- File: `site/script.js`
-- In `initHorizontal()`, distance is computed by:
-  - `const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);`
-- If you increase panel widths, this auto-updates the full scroll distance.
+Change these values to alter reveal pacing.
 
-### Scroll feel and timing
-- File: `site/script.js`
-- Master horizontal scrub:
-  - `scrub: 0.95` (lower = snappier, higher = smoother/slower)
-- Per-section animation timing:
-  - `start` / `end` values in each `ScrollTrigger` (for example `start: "left 74%"`).
-- Beat reveal timing (`#beatFive`) is in the Take Five section trigger; move that `start` value earlier/later to control reveal moment.
+### Scroll length and smoothness
 
-## Accessibility and fallback
+File: `site/script.js`
 
-- `prefers-reduced-motion: reduce` is supported.
-- In reduced motion, the site switches to a vertical stacked layout and disables heavy transforms.
-- Navigation still jumps to sections in fallback mode.
+- Total horizontal distance:
+  - `getDistance()`
+- Scrub feel:
+  - `scrub: 0.88` in the master ScrollTrigger
+- Snap behavior:
+  - `snap.duration` and `snapTo` in the master ScrollTrigger
 
+### Lenis toggle
+
+File: `site/index.html`
+
+- Current:
+  - `<body data-lenis="on">`
+- Disable Lenis:
+  - set `data-lenis="off"`
+
+## Accessibility
+
+- `prefers-reduced-motion` is supported.
+- In reduced motion mode:
+  - heavy animations are disabled,
+  - horizontal layout falls back to vertical stacked panels,
+  - Spotify panels remain usable.
+
+## Included required embeds
+
+- Good Morning clean (non-explicit) embed at panel P3.
+- Take Five embed at panel P10.
+- Mobile mode uses collapsible "Listen on Spotify" buttons.
