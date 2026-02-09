@@ -1,133 +1,65 @@
-﻿# My Personal Soundtrack Project - V2
+﻿# My Personal Soundtrack Website
 
-Cinematic single-page website for CLE 10 using vanilla HTML/CSS/JS with GSAP ScrollTrigger horizontal storytelling.
-
-## Project structure
-
-```text
-/site
-  index.html
-  styles.css
-  script.js
-  README.md
-  /assets
-    README_ASSETS.txt
-    ...image files
-```
+Static GitHub Pages site built with:
+- `index.html`
+- `styles.css`
+- `script.js`
+- GSAP + ScrollTrigger (CDN)
+- Lenis smooth scrolling (CDN)
 
 ## Run locally
 
-1. Open the folder in VS Code.
-2. Start Live Server on `site/index.html`.
-3. Test desktop + mobile breakpoints.
-4. Test with reduced motion enabled in OS/browser settings.
+1. Open the repo folder in VS Code.
+2. Run Live Server on `index.html`.
+3. Test desktop and mobile breakpoints.
+4. Test reduced-motion mode in OS/browser accessibility settings.
 
-## Deploy to GitHub Pages
+## How horizontal scroll works
 
-### Option A (recommended for `/site` folder): GitHub Actions
+- `#horizontalShell` is pinned by ScrollTrigger.
+- `#horizontalTrack` is translated on the X axis.
+- User scrolls down normally; content moves horizontally through panels.
+- Scroll distance is computed from:
+  - `track.scrollWidth - window.innerWidth`
+- Panel snap is gentle and based on real panel offsets.
 
-Create `.github/workflows/pages.yml`:
+## How Lenis is integrated
 
-```yaml
-name: Deploy static site
+- Lenis runs only when:
+  - reduced motion is not active,
+  - `body[data-lenis]` is not `off`,
+  - Lenis/GSAP/ScrollTrigger are available.
+- Lenis and ScrollTrigger are synced via `lenis.on('scroll', ScrollTrigger.update)` and GSAP ticker.
+- If Lenis fails or is unavailable, scrolling falls back to native browser scroll.
 
-on:
-  push:
-    branches: ["main"]
-  workflow_dispatch:
+### Disable Lenis
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+Set this in `index.html`:
 
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
-jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
-      - id: deployment
-        uses: actions/deploy-pages@v4
+```html
+<body data-lenis="off">
 ```
 
-Then set `Settings > Pages > Source` to `GitHub Actions`.
+## Tuning scrub and snap
 
-### Option B
+File: `script.js`
 
-If you want branch deployment without Actions, move `site/*` to repo root or `/docs`.
+Inside `initHorizontal()` master ScrollTrigger:
+- `scrub: 0.85` controls smoothing feel.
+- `snap.duration` controls snap speed.
+- `snapTo` uses `snapPoints()` (panel offsets) for panel-by-panel snapping.
 
-## Where to put images
+## Reduced-motion behavior
 
-Put all images inside `site/assets/`.
+- On `prefers-reduced-motion: reduce`:
+  - Lenis is disabled.
+  - heavy transforms/animations are disabled.
+  - horizontal track falls back to vertical stacked panels.
+  - navigation still jumps to each section.
 
-Reference list and recommended sizes are documented in:
-- `site/assets/README_ASSETS.txt`
+## Assets
 
-## Horizontal scrolling setup (how it works)
+Required assets and recommended dimensions are listed in:
+- `assets/README_ASSETS.txt`
 
-- `script.js` pins `#horizontalShell`.
-- `#horizontalTrack` translates on X while user scrolls down.
-- Each panel is `100vw`; selected hero panels use `120vw` (`.panel-wide`).
-- ScrollTrigger `snap` is enabled with custom points for gentle panel-to-panel snapping.
-- Lenis smooth scrolling runs only when:
-  - browser supports it,
-  - reduced motion is not active,
-  - `body[data-lenis]` is not set to `off`.
-
-## Tuning guide
-
-### Panel widths
-
-File: `site/styles.css`
-
-- Base panel width:
-  - `.panel { width: 100vw; flex: 0 0 100vw; }`
-- Wide hero panels:
-  - `.panel-wide { width: 120vw; flex: 0 0 120vw; }`
-
-Change these values to alter reveal pacing.
-
-### Scroll length and smoothness
-
-File: `site/script.js`
-
-- Total horizontal distance:
-  - `getDistance()`
-- Scrub feel:
-  - `scrub: 0.88` in the master ScrollTrigger
-- Snap behavior:
-  - `snap.duration` and `snapTo` in the master ScrollTrigger
-
-### Lenis toggle
-
-File: `site/index.html`
-
-- Current:
-  - `<body data-lenis="on">`
-- Disable Lenis:
-  - set `data-lenis="off"`
-
-## Accessibility
-
-- `prefers-reduced-motion` is supported.
-- In reduced motion mode:
-  - heavy animations are disabled,
-  - horizontal layout falls back to vertical stacked panels,
-  - Spotify panels remain usable.
-
-## Included required embeds
-
-- Good Morning clean (non-explicit) embed at panel P3.
-- Take Five embed at panel P10.
-- Mobile mode uses collapsible "Listen on Spotify" buttons.
+Keep filenames exact for GitHub Pages compatibility.

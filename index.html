@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Personal Soundtrack - Version 2</title>
-  <meta name="description" content="CLE 10 My Personal Soundtrack Project - cinematic horizontal narrative site" />
+  <title>My Personal Soundtrack</title>
+  <meta name="description" content="CLE 10 soundtrack narrative website" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bodoni+Moda:opsz,wght@6..96,600;6..96,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -18,347 +18,284 @@
       <img src="assets/ui_burger.svg" alt="" aria-hidden="true" />
     </button>
 
-    <span class="rail-label">SOUNDTRACK</span>
+    <span class="rail-title">SOUNDTRACK</span>
 
-    <nav class="rail-nav" aria-label="Chapter links">
-      <button class="rail-link is-active" data-target-index="0" data-chapter="intro">
-        INTRO
-      </button>
-      <button class="rail-link" data-target-index="2" data-chapter="good-morning">
-        GOOD MORNING
-      </button>
-      <button class="rail-link" data-target-index="9" data-chapter="take-five">
-        TAKE FIVE
-      </button>
-      <button class="rail-link" data-target-index="16" data-chapter="reflection">
-        REFLECTION
-      </button>
-      <button class="rail-link" data-target-index="17" data-chapter="sources">
-        SOURCES
-      </button>
+    <nav class="rail-nav" aria-label="Chapters">
+      <button class="rail-item is-active" data-target-index="0" data-chapter="intro">INTRO</button>
+      <button class="rail-item" data-target-index="2" data-chapter="good-morning">GOOD MORNING</button>
+      <button class="rail-item" data-target-index="8" data-chapter="take-five">TAKE FIVE</button>
+      <button class="rail-item" data-target-index="15" data-chapter="reflection">REFLECTION</button>
+      <button class="rail-item" data-target-index="16" data-chapter="sources">SOURCES</button>
     </nav>
   </aside>
 
   <div class="menu-scrim" id="menuScrim" hidden></div>
 
-  <aside class="menu-drawer" id="menuDrawer" aria-label="Full section menu">
-    <div class="menu-head">
-      <p class="menu-kicker">CLE 10 Narrative Site</p>
+  <aside class="menu-drawer" id="menuDrawer" aria-label="Section drawer">
+    <div class="drawer-head">
+      <p class="drawer-kicker">My Personal Soundtrack</p>
       <button class="rail-btn" id="menuClose" aria-label="Close menu">
         <img src="assets/ui_close.svg" alt="" aria-hidden="true" />
       </button>
     </div>
 
-    <ul class="menu-list">
-      <li><button class="menu-link" data-target-index="0">P0 Landing Hero</button></li>
-      <li><button class="menu-link" data-target-index="1">P1 Purpose + Rationale</button></li>
-      <li><button class="menu-link" data-target-index="2">P2 Good Morning Intro</button></li>
-      <li><button class="menu-link" data-target-index="3">P3 Good Morning Listen</button></li>
-      <li><button class="menu-link" data-target-index="4">P4 Good Morning A</button></li>
-      <li><button class="menu-link" data-target-index="5">P5 Good Morning B</button></li>
-      <li><button class="menu-link" data-target-index="6">P6 Good Morning C</button></li>
-      <li><button class="menu-link" data-target-index="7">P7 Good Morning D</button></li>
-      <li><button class="menu-link" data-target-index="8">P8 Transition</button></li>
-      <li><button class="menu-link" data-target-index="9">P9 Take Five Intro</button></li>
-      <li><button class="menu-link" data-target-index="10">P10 Take Five Listen</button></li>
-      <li><button class="menu-link" data-target-index="11">P11 Take Five A</button></li>
-      <li><button class="menu-link" data-target-index="12">P12 Take Five B</button></li>
-      <li><button class="menu-link" data-target-index="13">P13 Take Five C</button></li>
-      <li><button class="menu-link" data-target-index="14">P14 Take Five D</button></li>
-      <li><button class="menu-link" data-target-index="15">P15 Why Together</button></li>
-      <li><button class="menu-link" data-target-index="16">P16 Reflection</button></li>
-      <li><button class="menu-link" data-target-index="17">P17 Resources</button></li>
-    </ul>
+    <div class="drawer-links">
+      <button class="drawer-link" data-target-index="0">Landing</button>
+      <button class="drawer-link" data-target-index="1">Why I built this as a site</button>
+      <button class="drawer-link" data-target-index="2">Good Morning chapter intro</button>
+      <button class="drawer-link" data-target-index="3">Good Morning Spotify</button>
+      <button class="drawer-link" data-target-index="4">Why this song?</button>
+      <button class="drawer-link" data-target-index="5">What does it push me toward?</button>
+      <button class="drawer-link" data-target-index="6">Valedictorian lyric panel</button>
+      <button class="drawer-link" data-target-index="7">How does it represent me right now?</button>
+      <button class="drawer-link" data-target-index="8">Take Five chapter intro</button>
+      <button class="drawer-link" data-target-index="9">Take Five Spotify</button>
+      <button class="drawer-link" data-target-index="10">Why this piece?</button>
+      <button class="drawer-link" data-target-index="11">How can a song with no words say so much?</button>
+      <button class="drawer-link" data-target-index="12">What makes it different without trying too hard?</button>
+      <button class="drawer-link" data-target-index="13">Does it match how I live now?</button>
+      <button class="drawer-link" data-target-index="14">Why these two songs together?</button>
+      <button class="drawer-link" data-target-index="15">Unit reflection</button>
+      <button class="drawer-link" data-target-index="16">Sources</button>
+    </div>
   </aside>
 
   <main id="horizontalShell" class="horizontal-shell">
     <div id="horizontalTrack" class="horizontal-track">
 
-      <section class="panel panel-wide ch-intro landing" id="section-0" data-index="0" data-chapter="intro" style="--bg-image:url('assets/gm_hero.webp')">
-        <div class="panel-media"></div>
-        <div class="panel-content hero-content">
-          <p class="corner-tag">P0</p>
-          <p class="kicker">CLE 10 | Personal Identity + Music</p>
-          <h1 class="mega-title split-reveal">
-            <span>MY PERSONAL</span>
-            <span>SOUNDTRACK</span>
-          </h1>
-          <p class="thesis">I picked two songs that push me to grow with momentum while keeping my creativity intentional and original.</p>
-          <button class="scroll-cue" data-target-index="1" aria-label="Scroll to project purpose">SCROLL -></button>
+      <section class="panel panel-wide theme-bw-dark panel-landing" id="section-0" data-index="0" data-chapter="intro" style="--bg-image:url('assets/gm_hero.webp')">
+        <div class="panel-media media-hero"></div>
+        <div class="panel-content hero-split">
+          <article class="hero-text anim-card">
+            <p class="micro-label">CLE 10 | Personal Identity + Music</p>
+            <h1 class="hero-title anim-heading">
+              <span>MY PERSONAL</span>
+              <span>SOUNDTRACK</span>
+            </h1>
+            <p class="name-line">Jovan</p>
+            <p class="hero-tagline">Two songs, one direction: keep growing while staying original in subtle ways.</p>
+          </article>
+
+          <figure class="hero-figure parallax-soft" aria-hidden="true">
+            <img src="assets/gm_support_01.webp" alt="" loading="lazy" />
+          </figure>
         </div>
       </section>
 
-      <section class="panel ch-intro purpose" id="section-1" data-index="1" data-chapter="intro">
-        <div class="panel-content prose-block">
-          <p class="corner-tag">P1</p>
-          <p class="kicker">Project Purpose + Format Rationale</p>
-          <h2>Why I built this as a scrolling site</h2>
-          <blockquote>
-            I chose a scrolling website instead of slides because it reflects how I like to do things differently in a subtle but intentional way, similar to how Take Five feels familiar at first, but reveals a different structure when I look closer.
-          </blockquote>
-          <p>I made this for my teacher to show my thinking clearly, step by step, in a cinematic sequence.</p>
-          <ul>
-            <li>I value growth, creativity, and uniqueness.</li>
-            <li>I learn quickly and think outside the box.</li>
-            <li>I am actively improving procrastination and overthinking by starting sooner.</li>
-          </ul>
+      <section class="panel theme-bw-light panel-intro" id="section-1" data-index="1" data-chapter="intro">
+        <div class="panel-content prose-block anim-card">
+          <p class="micro-label">Intro</p>
+          <h2 class="section-title anim-heading">Why I built this as a site</h2>
+          <p>
+            Making this project as a website let me express two messages from the songs I chose. Good Morning feels like a fresh start - the kind of energy that pushes you to get up and improve. Take Five shows another side of me: doing something different in a way that still feels natural and high-quality, not different just to be loud.
+          </p>
+          <p>
+            Building a site also matches how I like to create. I am a fast learner who thinks outside the box, and for you as my teacher, this format shows not just what songs I picked but how I think through choices and effort behind the final result.
+          </p>
         </div>
       </section>
 
-      <section class="panel panel-wide ch-gm gm-intro" id="section-2" data-index="2" data-chapter="good-morning" style="--bg-image:url('assets/gm_support_01.webp')">
-        <div class="panel-media"></div>
-        <div class="panel-content chapter-intro">
-          <p class="corner-tag">P2</p>
-          <p class="kicker">Chapter 01</p>
-          <h2 class="chapter-title split-reveal" id="gmIntroTitle">
-            <span>GOOD</span>
-            <span>MORNING</span>
-          </h2>
+      <section class="panel panel-wide theme-gm panel-gm-intro" id="section-2" data-index="2" data-chapter="good-morning" style="--bg-image:url('assets/gm_hero.webp')">
+        <div class="panel-media media-gm"></div>
+        <div class="panel-content chapter-intro anim-card">
+          <p class="chapter-kicker">CHAPTER 01</p>
+          <h2 class="chapter-title anim-heading">GOOD MORNING</h2>
+          <p class="chapter-byline">by Kanye West</p>
+          <div class="accent-line-wrap" aria-hidden="true">
+            <span class="accent-line line-a anim-line"></span>
+            <span class="accent-line line-b anim-line"></span>
+          </div>
         </div>
       </section>
 
-      <section class="panel ch-gm listen-panel gm-listen" id="section-3" data-index="3" data-chapter="good-morning">
-        <div class="panel-content listen-wrap">
-          <p class="corner-tag">P3</p>
-          <article class="listen-card">
-            <p class="kicker">LISTEN | GOOD MORNING</p>
-            <h3>Kanye West - Good Morning (Clean / Non-explicit)</h3>
-            <p>I use this track as my start signal when I need energy and focus.</p>
-            <button class="listen-toggle" type="button" aria-expanded="false">Listen on Spotify</button>
-            <div class="embed-shell">
+      <section class="panel theme-gm panel-spotify-gm" id="section-3" data-index="3" data-chapter="good-morning">
+        <div class="panel-content spotify-wrap anim-card">
+          <p class="spotify-label">Spotify &mdash; Non-explicit version</p>
+          <div class="spotify-layout">
+            <div class="spotify-card">
               <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/5MTwfuYDZqRIEwOAamaT2I?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
             </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel ch-gm gm-a" id="section-4" data-index="4" data-chapter="good-morning" style="--bg-image:url('assets/gm_support_02.webp')">
-        <div class="panel-media"></div>
-        <div class="panel-content card-layout">
-          <article class="info-card gm-cream">
-            <p class="rubric-tag">Rubric A</p>
-            <h3>Good Morning: Song Description</h3>
-            <ul>
-              <li>I chose <strong>"Good Morning"</strong> by <strong>Kanye West</strong>, from <strong>Graduation</strong> (2007, hip-hop).</li>
-              <li>I see Kanye as an artist who mixes personal ambition with big, layered production ideas.</li>
-              <li>I hear this as an opening statement song: wake up, step up, and move into a new chapter.</li>
-              <li>I marked this as Fact check because sample credit details can vary slightly across sources.</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel ch-gm gm-b" id="section-5" data-index="5" data-chapter="good-morning">
-        <div class="panel-content card-layout">
-          <article class="info-card gm-cream">
-            <p class="rubric-tag">Rubric B</p>
-            <h3>Good Morning: Mood + Message</h3>
-            <ul>
-              <li>I feel happy, upbeat, and a little nostalgic when I hear it.</li>
-              <li>I hear momentum, not chaos. It sounds focused and forward.</li>
-              <li>To me the message is simple: I should start, keep moving, and build confidence through action.</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel ch-gm gm-c" id="section-6" data-index="6" data-chapter="good-morning">
-        <div class="panel-content split-layout">
-          <article class="info-card gm-cream">
-            <p class="rubric-tag">Rubric C</p>
-            <h3>Good Morning: Lyric + Personal Connection</h3>
-            <p class="quote-line">"Good morning, look at the valedictorian."</p>
-            <ul>
-              <li>I interpret "valedictorian" as becoming the best version of myself, not only being the top student.</li>
-              <li>This lyric matches my values: growth, creativity, and uniqueness.</li>
-              <li>Because I overthink and procrastinate sometimes, I use this line as a reminder to start now.</li>
-            </ul>
-          </article>
-          <figure class="media-card" aria-hidden="true">
-            <img src="assets/cover_graduation.webp" alt="Graduation cover art" loading="lazy" />
-          </figure>
-        </div>
-      </section>
-
-      <section class="panel ch-gm gm-d" id="section-7" data-index="7" data-chapter="good-morning">
-        <div class="panel-content card-layout">
-          <article class="info-card gm-cream">
-            <p class="rubric-tag">Rubric D</p>
-            <h3>Good Morning: Now vs Future</h3>
-            <ul>
-              <li>This song reflects both my present and my future.</li>
-              <li>Now: I am practicing consistency and building momentum by starting faster.</li>
-              <li>Future: I want disciplined habits to feel natural so progress becomes my normal standard.</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel transition-panel" id="section-8" data-index="8" data-chapter="good-morning">
-        <div class="panel-content transition-content">
-          <p class="corner-tag">P8</p>
-          <p class="kicker">Hard Switch</p>
-          <h2 class="transition-title split-reveal">
-            <span>MOMENTUM</span>
-            <span>TO</span>
-            <span>PRECISION</span>
-          </h2>
-          <div class="transition-lines" aria-hidden="true">
-            <span class="line line-left"></span>
-            <span class="line line-right"></span>
+            <figure class="panel-figure cover-figure parallax-soft" aria-hidden="true">
+              <img src="assets/cover_graduation.webp" alt="" loading="lazy" />
+            </figure>
           </div>
-          <p class="transition-note">I move from loud motivation to subtle structure, because both help me grow in different ways.</p>
         </div>
       </section>
 
-      <section class="panel panel-wide ch-tf tf-intro" id="section-9" data-index="9" data-chapter="take-five" style="--bg-image:url('assets/tf_hero.webp')">
-        <div class="panel-media"></div>
-        <div class="panel-content chapter-intro tf-copy">
-          <p class="corner-tag">P9</p>
-          <p class="kicker">Chapter 02</p>
-          <h2 class="chapter-title split-reveal" id="tfIntroTitle">
-            <span>TAKE</span>
-            <span>FIVE</span>
-          </h2>
-        </div>
-      </section>
-
-      <section class="panel ch-tf listen-panel tf-listen" id="section-10" data-index="10" data-chapter="take-five">
-        <div class="panel-content listen-wrap tf-copy">
-          <p class="corner-tag">P10</p>
-          <article class="listen-card paper-card">
-            <p class="kicker">LISTEN | TAKE FIVE</p>
-            <h3>The Dave Brubeck Quartet - Take Five</h3>
-            <p>I listen to this when I want calm focus and better choices, not just louder effort.</p>
-            <button class="listen-toggle" type="button" aria-expanded="false">Listen on Spotify</button>
-            <div class="embed-shell">
-              <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/1YQWosTIljIvxAgHWTp7KP?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-            </div>
+      <section class="panel theme-gm panel-gm-why" id="section-4" data-index="4" data-chapter="good-morning" style="--bg-image:url('assets/gm_support_01.webp')">
+        <div class="panel-media media-gm-support"></div>
+        <div class="panel-content split-content">
+          <article class="paper-card anim-card">
+            <h3 class="question-title anim-heading">Why this song?</h3>
+            <p>
+              I chose Good Morning by Kanye West from the album Graduation (2007), a hip-hop track with a confident but uplifting sound. It’s upbeat and makes me feel like I should get up and do something. What stands out to me is that it opens the album with a fresh start feeling, and it introduces the graduation idea as more than school - it’s about moving into a new level of growth. That opening-chapter energy connects to how I think about improving: you don’t wait to feel ready, you start moving and you become better through the work.
+            </p>
+            <p>
+              Kanye is known for blending personal ambition with bold production choices, and this opener sets that tone clearly.
+            </p>
           </article>
-        </div>
-      </section>
-
-      <section class="panel ch-tf tf-a" id="section-11" data-index="11" data-chapter="take-five" style="--bg-image:url('assets/tf_support_01.webp')">
-        <div class="panel-media"></div>
-        <div class="panel-content card-layout tf-copy">
-          <article class="info-card paper-card">
-            <p class="rubric-tag">Rubric A</p>
-            <h3>Take Five: Song Description</h3>
-            <ul>
-              <li>I chose <strong>"Take Five"</strong> by <strong>The Dave Brubeck Quartet</strong> (written by Paul Desmond).</li>
-              <li>I classify it as cool jazz from the <strong>Time Out</strong> period, commonly dated to 1959.</li>
-              <li>I hear it as proof that unusual structure can still feel clean and approachable.</li>
-              <li>I marked this as Fact check because some sources highlight 1961 for chart momentum.</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel ch-tf tf-b" id="section-12" data-index="12" data-chapter="take-five">
-        <div class="panel-content card-layout tf-copy">
-          <article class="info-card paper-card">
-            <p class="rubric-tag">Rubric B</p>
-            <h3>Take Five: Mood + Message</h3>
-            <ul>
-              <li>I hear calm confidence and controlled creativity.</li>
-              <li>I hear the track as minimal, but every choice feels intentional.</li>
-              <li>I take its message this way: originality is strongest when it is disciplined, not forced.</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel ch-tf tf-c" id="section-13" data-index="13" data-chapter="take-five">
-        <div class="panel-content split-layout tf-copy">
-          <article class="info-card paper-card">
-            <p class="rubric-tag">Rubric C</p>
-            <h3>Take Five: Musical Element + Personal Connection</h3>
-            <ul>
-              <li>I notice that it can feel like 4/4 at first, but when I count it, the 5/4 pattern appears.</li>
-              <li>I see my work similarly: it can look standard at first, but closer attention reveals my choices and effort.</li>
-              <li>I aim for "different done well" by using limited tools intentionally, not by over-designing.</li>
-            </ul>
-            <div class="beat-row" aria-label="5 over 4 rhythmic reveal">
-              <span class="beat"></span>
-              <span class="beat"></span>
-              <span class="beat"></span>
-              <span class="beat"></span>
-              <span class="beat beat-five" id="beatFive"></span>
-            </div>
-          </article>
-          <figure class="media-card" aria-hidden="true">
-            <img src="assets/cover_timeout.webp" alt="Time Out cover art" loading="lazy" />
+          <figure class="panel-figure parallax-soft" aria-hidden="true">
+            <img src="assets/gm_support_01.webp" alt="" loading="lazy" />
           </figure>
         </div>
       </section>
 
-      <section class="panel ch-tf tf-d" id="section-14" data-index="14" data-chapter="take-five" style="--bg-image:url('assets/tf_support_02.webp')">
-        <div class="panel-media"></div>
-        <div class="panel-content card-layout tf-copy">
-          <article class="info-card paper-card">
-            <p class="rubric-tag">Rubric D</p>
-            <h3>Take Five: Now vs Future</h3>
-            <ul>
-              <li>I feel this mostly reflects how I live now: subtle creativity and originality matter to me.</li>
-              <li>I want my future work to keep that same quiet depth so quality increases the closer people look.</li>
-              <li>The 5/4 idea reminds me that structure can carry personality without being loud.</li>
-            </ul>
+      <section class="panel theme-gm panel-gm-push" id="section-5" data-index="5" data-chapter="good-morning" style="--bg-image:url('assets/gm_support_02.webp')">
+        <div class="panel-media media-gm-support"></div>
+        <div class="panel-content split-content reverse">
+          <figure class="panel-figure wide parallax-soft" aria-hidden="true">
+            <img src="assets/gm_support_02.webp" alt="" loading="lazy" />
+          </figure>
+          <article class="paper-card anim-card">
+            <h3 class="question-title anim-heading">What does it push me toward?</h3>
+            <p>
+              Good Morning really makes me strive to be better. I like having a goal in front of me and doing what I can to reach it. The message I take from it is not just “be successful,” but “keep improving.” It’s about building momentum and becoming the best version of yourself through consistency, not luck.
+            </p>
+            <p>
+              As a fast learner, that momentum matters because it helps me move from overthinking into action.
+            </p>
           </article>
         </div>
       </section>
 
-      <section class="panel compare-panel" id="section-15" data-index="15" data-chapter="take-five">
-        <div class="panel-content prose-block tf-copy">
-          <p class="corner-tag">P15</p>
-          <p class="kicker">Why these two together</p>
-          <h2>Lyrics for drive, structure for discipline</h2>
-          <ul>
-            <li>I use Good Morning for momentum and action.</li>
-            <li>I use Take Five for restraint and intentional originality.</li>
-            <li>I use them together to represent my growth path: start faster, stay consistent, and make thoughtful creative choices.</li>
+      <section class="panel theme-gm panel-gm-lyric" id="section-6" data-index="6" data-chapter="good-morning">
+        <div class="panel-content lyric-panel anim-card">
+          <p class="lyric-giant anim-heading">"Good morning, look at the valedictorian."</p>
+          <p>
+            This line stands out to me because I don’t take valedictorian as only a school thing. To me it represents a better version of myself that I’m trying to reach. It connects to my values of growth and uniqueness - pushing to improve, but doing it in my own way.
+          </p>
+          <p>
+            I also know I sometimes procrastinate by thinking too long instead of starting. This lyric feels like a wake-up call: stop waiting, start now, and earn the version of yourself I’m aiming for.
+          </p>
+          <div class="accent-line-wrap" aria-hidden="true">
+            <span class="accent-line line-a anim-line"></span>
+            <span class="accent-line line-b anim-line"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel theme-gm panel-gm-now" id="section-7" data-index="7" data-chapter="good-morning">
+        <div class="panel-content prose-card anim-card">
+          <h3 class="question-title anim-heading">How does it represent me right now?</h3>
+          <p>
+            This song reflects me now because I’m focused on growing and building consistency so that my future is easier and stronger. I don’t want improvement to be random - I want it to be something I build. Good Morning matches that mindset because it feels like choosing momentum on purpose.
+          </p>
+        </div>
+      </section>
+
+      <section class="panel panel-wide theme-transition panel-tf-intro" id="section-8" data-index="8" data-chapter="take-five" style="--bg-image:url('assets/tf_hero.webp')">
+        <div class="panel-media media-tf"></div>
+        <div class="panel-content chapter-intro tf-chapter anim-card">
+          <p class="chapter-kicker">CHAPTER 02</p>
+          <h2 class="chapter-title anim-heading">TAKE FIVE</h2>
+          <p class="chapter-byline">The Dave Brubeck Quartet</p>
+          <div class="accent-line-wrap" aria-hidden="true">
+            <span class="accent-line tf-line anim-line"></span>
+            <span class="accent-line tf-line anim-line"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel theme-tf panel-spotify-tf" id="section-9" data-index="9" data-chapter="take-five">
+        <div class="panel-content spotify-wrap anim-card">
+          <p class="spotify-label tf-label">Spotify embed</p>
+          <div class="spotify-card paper-card">
+            <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/1YQWosTIljIvxAgHWTp7KP?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel theme-tf panel-tf-why" id="section-10" data-index="10" data-chapter="take-five" style="--bg-image:url('assets/tf_support_01.webp')">
+        <div class="panel-media media-tf-support"></div>
+        <div class="panel-content split-content">
+          <article class="paper-card anim-card">
+            <h3 class="question-title anim-heading">Why this piece?</h3>
+            <p>
+              I chose Take Five by The Dave Brubeck Quartet. It’s often described as cool jazz from the Time Out era (1959). The piece uses an unusual 5/4 time signature, which is even referenced in its name. What’s interesting is that it still feels smooth and clean - it doesn’t sound weird just because it’s different. The difference is subtle, and that’s what makes it so good.
+            </p>
+            <p>
+              The group is known for exploring unusual time signatures, and this piece is one of the clearest examples of that approach.
+            </p>
+          </article>
+          <figure class="panel-figure parallax-soft" aria-hidden="true">
+            <img src="assets/tf_support_01.webp" alt="" loading="lazy" />
+          </figure>
+        </div>
+      </section>
+
+      <section class="panel theme-tf panel-tf-words" id="section-11" data-index="11" data-chapter="take-five" style="--bg-image:url('assets/tf_support_02.webp')">
+        <div class="panel-media media-tf-support"></div>
+        <div class="panel-content prose-card paper-card anim-card">
+          <h3 class="question-title anim-heading">How can a song with no words say so much?</h3>
+          <p>
+            Take Five has a big message to me, even though it has no lyrics. It’s unique, but that uniqueness doesn’t make it awkward to listen to. It feels high-quality and controlled, but not robotic - it still has personality. It sounds disciplined, but it still feels full and alive. That balance is something I respect.
+          </p>
+        </div>
+      </section>
+
+      <section class="panel theme-tf panel-tf-diff" id="section-12" data-index="12" data-chapter="take-five">
+        <div class="panel-content split-content reverse">
+          <article class="paper-card anim-card">
+            <h3 class="question-title anim-heading">What makes it different without trying too hard?</h3>
+            <p>
+              It actually took me a long time to notice that this piece was in 5/4 and not 4/4. Even so, you can still tell there’s something special about it when you listen - you feel the difference before you can explain it.
+            </p>
+            <p>
+              That represents how I like to do things differently. I think outside the box, but I don’t want to add a bunch of extra things just to impress people. I’d rather use the tools I have intentionally and make a few details really strong. I like staying within what still feels normal, but adding something that makes it quietly stand out.
+            </p>
+            <div class="ticks-row" aria-label="5 over 4 reveal">
+              <span class="tick"></span>
+              <span class="tick"></span>
+              <span class="tick"></span>
+              <span class="tick"></span>
+              <span class="tick tick-five" id="tickFive"></span>
+            </div>
+          </article>
+          <figure class="panel-figure parallax-soft" aria-hidden="true">
+            <img src="assets/cover_timeout.webp" alt="" loading="lazy" />
+          </figure>
+        </div>
+      </section>
+
+      <section class="panel theme-tf panel-tf-now" id="section-13" data-index="13" data-chapter="take-five">
+        <div class="panel-content prose-card paper-card anim-card">
+          <h3 class="question-title anim-heading">Does it match how I live now, or who I want to be?</h3>
+          <p>
+            This song represents how I live right now. I appreciate originality that’s subtle and thoughtful, and I try to do things differently for a reason - not just to be different. Take Five proves you can stand out without being messy, and that’s the kind of creativity I want in my own work.
+          </p>
+        </div>
+      </section>
+
+      <section class="panel theme-tf panel-together" id="section-14" data-index="14" data-chapter="take-five">
+        <div class="panel-content prose-card paper-card anim-card">
+          <h3 class="question-title anim-heading">Why these two songs together?</h3>
+          <ul class="only-bullets">
+            <li>Good Morning is my “momentum” song &mdash; growth, fresh starts, and pushing forward.</li>
+            <li>Take Five is my “quiet originality” song &mdash; different, but controlled and high-quality.</li>
+            <li>One uses lyrics to make the message obvious; the other uses structure to make you feel it.</li>
+            <li>Together they describe how I want to grow: improve constantly, but stay original.</li>
           </ul>
-          <blockquote>
-            I chose a scrolling website instead of slides because it reflects how I like to do things differently in a subtle but intentional way, similar to how Take Five feels familiar at first, but reveals a different structure when I look closer.
-          </blockquote>
         </div>
       </section>
 
-      <section class="panel reflection-panel" id="section-16" data-index="16" data-chapter="reflection">
-        <div class="panel-content card-layout tf-copy">
-          <article class="info-card paper-card">
-            <p class="corner-tag">P16</p>
-            <h3>Unit Reflection + Starter Plan</h3>
-            <p><strong>Prompt 1:</strong> I learned that identity is not only personality; it is habits repeated over time.</p>
-            <p><strong>Prompt 2:</strong> Music helped me reflect in two ways: lyrics gave direct motivation, and rhythm gave design-level insight.</p>
-            <p><strong>Prompt 3:</strong> My key change is to start work earlier with imperfect drafts instead of waiting for perfect ideas.</p>
-            <p class="plan-title">Starter plan (next 2 weeks):</p>
-            <ul>
-              <li>I will use a 20-minute start rule every day.</li>
-              <li>I will track consistency first, then polish.</li>
-              <li>I will add one intentional creative detail to each major task.</li>
-            </ul>
-          </article>
+      <section class="panel theme-bw-dark panel-reflection" id="section-15" data-index="15" data-chapter="reflection">
+        <div class="panel-content reflection-wrap anim-card">
+          <h3 class="section-title anim-heading">Unit reflection</h3>
+          <p class="prompt-line">What did this project teach me about my identity and values?</p>
+          <p class="prompt-line">How did music help me describe myself more clearly than normal writing?</p>
+          <p class="prompt-line">How do I want to apply growth + subtle originality in the future?</p>
+          <textarea class="reflection-pad" placeholder="Write reflection notes here..."></textarea>
         </div>
       </section>
 
-      <section class="panel resources-panel" id="section-17" data-index="17" data-chapter="sources">
-        <div class="panel-content resources-wrap tf-copy">
-          <p class="corner-tag">P17</p>
-          <div>
-            <p class="kicker">Resources</p>
-            <h2>Fact-check and reference links</h2>
-            <ul class="resource-list">
-              <li><a href="https://en.wikipedia.org/wiki/Good_Morning_(Kanye_West_song)" target="_blank" rel="noreferrer">Good Morning overview</a></li>
-              <li><a href="https://genius.com/Kanye-west-good-morning-lyrics" target="_blank" rel="noreferrer">Good Morning lyrics</a></li>
-              <li><a href="https://en.wikipedia.org/wiki/Take_Five" target="_blank" rel="noreferrer">Take Five overview</a></li>
-              <li><a href="https://www.britannica.com/topic/Take-Five" target="_blank" rel="noreferrer">Take Five context</a></li>
-              <li><a href="https://en.wikipedia.org/wiki/Time_Out_(The_Dave_Brubeck_Quartet_album)" target="_blank" rel="noreferrer">Time Out album background</a></li>
-            </ul>
-          </div>
-          <div class="resource-covers" aria-hidden="true">
-            <figure class="cover-shot"><img src="assets/cover_graduation.webp" alt="" loading="lazy" /></figure>
-            <figure class="cover-shot"><img src="assets/cover_timeout.webp" alt="" loading="lazy" /></figure>
-          </div>
+      <section class="panel theme-bw-light panel-sources" id="section-16" data-index="16" data-chapter="sources">
+        <div class="panel-content sources-wrap anim-card">
+          <h3 class="section-title anim-heading">Sources</h3>
+          <a href="https://open.spotify.com/track/5MTwfuYDZqRIEwOAamaT2I" target="_blank" rel="noreferrer">Spotify - Good Morning (non-explicit)</a>
+          <a href="https://open.spotify.com/track/1YQWosTIljIvxAgHWTp7KP" target="_blank" rel="noreferrer">Spotify - Take Five</a>
+          <a href="https://en.wikipedia.org/wiki/Good_Morning_(Kanye_West_song)" target="_blank" rel="noreferrer">Song information - Good Morning</a>
+          <a href="https://en.wikipedia.org/wiki/Take_Five" target="_blank" rel="noreferrer">Song information - Take Five</a>
+          <a href="https://en.wikipedia.org/wiki/Time_Out_(The_Dave_Brubeck_Quartet_album)" target="_blank" rel="noreferrer">Album context - Time Out</a>
         </div>
       </section>
 
