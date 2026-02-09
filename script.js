@@ -24,10 +24,21 @@
   const paperCards = Array.from(document.querySelectorAll(".paper-card"));
   const heroPortrait = document.querySelector(".hero-portrait img");
   const heroPortraitFrame = document.querySelector(".hero-portrait");
-  const collageImages = Array.from(document.querySelectorAll(".cover-collage img, .sources-collage img"));
-  const tickFive = document.getElementById("tickFive");
+  const collageImages = Array.from(document.querySelectorAll(".cover-collage img, .sources-collage img, .together-collage img"));
   const images = Array.from(document.querySelectorAll("img"));
   const revealMedia = Array.from(document.querySelectorAll(".reveal-media"));
+
+  const MEDIA_MAP = {
+    cover_graduation: "assets/cover_graduation.webp",
+    extragraduation: "assets/extragraduation.webp",
+    cover_timeout: "assets/cover_timeout.webp",
+    fiveextra: "assets/fiveextra.webp",
+    gm_support_01: "assets/gm_support_01.webp",
+    gm_support_02: "assets/gm_support_02.webp",
+    gm_hero: "assets/gm_hero.webp",
+    tf_support_01: "assets/tf_support_01.webp",
+    tf_support_02: "assets/tf_support_02.webp"
+  };
 
   if (!shell || !track || panels.length === 0) {
     return;
@@ -204,6 +215,38 @@
     set("libs", `${gsapOk}/${stOk}/${lenisOk}`);
   };
 
+  const slotToDatasetKey = (slot) => `media${slot
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join("")}`;
+
+  const setPanelMediaSlots = () => {
+    panels.forEach((panel) => {
+      const bgKey = panel.dataset.mediaBg;
+      const bgSrc = bgKey ? MEDIA_MAP[bgKey] : "";
+
+      if (bgSrc) {
+        panel.style.setProperty("--bg-image", `url("${bgSrc}")`);
+      } else {
+        panel.style.removeProperty("--bg-image");
+      }
+
+      const slotImages = panel.querySelectorAll("img[data-media-slot]");
+      slotImages.forEach((img) => {
+        const slot = img.dataset.mediaSlot || "";
+        const datasetKey = slotToDatasetKey(slot);
+        const mediaKey = panel.dataset[datasetKey] || panel.dataset.media || "";
+        const src = MEDIA_MAP[mediaKey];
+
+        if (src) {
+          img.src = src;
+        } else {
+          img.removeAttribute("src");
+        }
+      });
+    });
+  };
+
   const clearParallaxStyles = () => {
     [...mediaLayers, ...parallaxItems, ...paperCards].forEach((element) => {
       element.style.transform = "";
@@ -216,11 +259,6 @@
     collageImages.forEach((image) => {
       image.style.transform = "";
     });
-
-    if (tickFive) {
-      tickFive.style.opacity = "";
-      tickFive.style.transform = "";
-    }
   };
 
   const setupImageFallbacks = () => {
@@ -228,7 +266,7 @@
       img.addEventListener(
         "error",
         () => {
-          const holder = img.closest(".hero-portrait, .panel-figure, .cover-collage, .sources-collage");
+          const holder = img.closest(".hero-portrait, .panel-figure, .cover-collage, .sources-collage, .together-collage, .stamp-media");
           if (holder) {
             if (holder.classList.contains("hero-portrait")) {
               holder.style.display = "none";
@@ -470,16 +508,6 @@
       const drift = (idx % 2 ? -1 : 1) * ratio * 12;
       image.style.transform = `translate3d(${drift}px, 0, 0)`;
     });
-
-    if (tickFive) {
-      const triggerPanel = document.getElementById("section-12");
-      if (triggerPanel) {
-        const start = triggerPanel.offsetLeft / Math.max(1, maxX);
-        const t = clamp((ratio - (start - 0.08)) / 0.16, 0, 1);
-        tickFive.style.opacity = String(t);
-        tickFive.style.transform = `scale(${0.45 + t * 0.55})`;
-      }
-    }
   };
 
   const initNativeHorizontal = () => {
@@ -769,25 +797,6 @@
       );
     });
 
-    if (tickFive) {
-      gsap.fromTo(
-        tickFive,
-        { autoAlpha: 0, scale: 0.45 },
-        {
-          autoAlpha: 1,
-          scale: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: "#section-12",
-            containerAnimation: masterTween,
-            start: "left 57%",
-            end: "left 40%",
-            scrub: true
-          }
-        }
-      );
-    }
-
     ScrollTrigger.refresh();
     if (distanceX() <= 8) {
       killGsapHorizontal();
@@ -1028,6 +1037,7 @@
 
   const boot = async () => {
     setupImageFallbacks();
+    setPanelMediaSlots();
 
     motionSetting = resolveMotionSetting();
     reducedMotion = computeReducedMotion();

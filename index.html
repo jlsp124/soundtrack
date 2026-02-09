@@ -84,7 +84,7 @@
   <main id="horizontalShell" class="horizontal-shell">
     <div id="horizontalTrack" class="horizontal-track">
 
-      <section class="panel panel-wide theme-bw-dark panel-landing" id="section-0" data-index="0" data-chapter="intro">
+      <section class="panel panel-wide theme-bw-dark panel-landing" id="section-0" data-index="0" data-chapter="intro" data-media-cover-a="cover_graduation" data-media-cover-b="cover_timeout">
         <div class="panel-content hero-split">
           <article class="hero-text anim-card">
             <p class="micro-label">CLE 10</p>
@@ -94,16 +94,13 @@
             </h1>
             <p class="name-line">By Jovan</p>
             <p class="hero-tagline">Two songs, one direction: keep growing while staying original in subtle ways.</p>
-
-            <div class="cover-collage parallax-soft" aria-hidden="true">
-              <img class="cover-a" src="assets/cover_graduation.webp" alt="" loading="lazy" />
-              <img class="cover-b" src="assets/cover_timeout.webp" alt="" loading="lazy" />
-            </div>
           </article>
-
-          <figure class="hero-portrait parallax-soft" aria-hidden="true">
-            <img src="assets/gm_support_02.webp" alt="" loading="eager" />
-          </figure>
+          <aside class="landing-media" aria-hidden="true">
+            <div class="cover-collage parallax-soft">
+              <img class="cover-a media-node" data-media-slot="cover-a" alt="" loading="eager" />
+              <img class="cover-b media-node" data-media-slot="cover-b" alt="" loading="eager" />
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -117,7 +114,7 @@
         </div>
       </section>
 
-      <section class="panel panel-wide theme-gm panel-gm-intro" id="section-2" data-index="2" data-chapter="good-morning" style="--bg-image:url('assets/gm_hero.webp')">
+      <section class="panel panel-wide theme-gm panel-gm-intro" id="section-2" data-index="2" data-chapter="good-morning" data-media-main="extragraduation">
         <div class="panel-media media-gm"></div>
         <div class="panel-content split-content gm-intro-layout">
           <div class="chapter-intro anim-card">
@@ -130,7 +127,7 @@
             </div>
           </div>
           <figure class="panel-figure chapter-support reveal-media parallax-soft" aria-hidden="true">
-            <img src="assets/gm_support_02.webp" alt="" loading="lazy" />
+            <img class="media-node" data-media-slot="main" alt="" loading="lazy" />
           </figure>
         </div>
       </section>
@@ -155,11 +152,11 @@
         </div>
       </section>
 
-      <section class="panel theme-gm panel-gm-push" id="section-5" data-index="5" data-chapter="good-morning" style="--bg-image:url('assets/gm_support_02.webp')">
+      <section class="panel theme-gm panel-gm-push" id="section-5" data-index="5" data-chapter="good-morning" data-media-bg="gm_support_02" data-media-main="gm_support_02">
         <div class="panel-media media-gm-support"></div>
         <div class="panel-content split-content reverse">
           <figure class="panel-figure wide parallax-soft" aria-hidden="true">
-            <img src="assets/gm_support_02.webp" alt="" loading="lazy" />
+            <img class="media-node" data-media-slot="main" alt="" loading="lazy" />
           </figure>
           <article class="paper-card anim-card">
             <h3 class="question-title anim-heading">What does it push me toward?</h3>
@@ -170,7 +167,7 @@
         </div>
       </section>
 
-      <section class="panel theme-gm panel-gm-lyric" id="section-6" data-index="6" data-chapter="good-morning" style="--bg-image:url('assets/gm_hero.webp')">
+      <section class="panel theme-gm panel-gm-lyric" id="section-6" data-index="6" data-chapter="good-morning" data-media-bg="gm_hero">
         <div class="panel-media media-gm-lyric"></div>
         <div class="panel-content centered-card">
           <article class="paper-card quote-card anim-card">
@@ -185,10 +182,10 @@
         </div>
       </section>
 
-      <section class="panel theme-gm panel-gm-now" id="section-7" data-index="7" data-chapter="good-morning">
+      <section class="panel theme-gm panel-gm-now" id="section-7" data-index="7" data-chapter="good-morning" data-media-main="gm_support_01">
         <div class="panel-content split-content">
-          <figure class="panel-figure parallax-soft" aria-hidden="true">
-            <img src="assets/gm_support_01.webp" alt="" loading="lazy" />
+          <figure class="panel-figure contain-media parallax-soft" aria-hidden="true">
+            <img class="media-node" data-media-slot="main" alt="" loading="lazy" />
           </figure>
           <article class="paper-card anim-card">
             <h3 class="question-title anim-heading">How does it represent me right now?</h3>
@@ -199,7 +196,7 @@
         </div>
       </section>
 
-      <section class="panel panel-wide theme-tf-intro panel-tf-intro" id="section-8" data-index="8" data-chapter="take-five" style="--bg-image:url('assets/tf_hero.webp')">
+      <section class="panel panel-wide theme-tf-intro panel-tf-intro" id="section-8" data-index="8" data-chapter="take-five" data-media-bg="fiveextra">
         <div class="panel-media media-tf"></div>
         <div class="panel-content chapter-intro tf-chapter anim-card">
           <p class="chapter-kicker">CHAPTER 02</p>
@@ -221,7 +218,7 @@
         </div>
       </section>
 
-      <section class="panel theme-tf panel-tf-why" id="section-10" data-index="10" data-chapter="take-five" style="--bg-image:url('assets/tf_support_01.webp')">
+      <section class="panel theme-tf panel-tf-why" id="section-10" data-index="10" data-chapter="take-five" data-media-bg="tf_support_01" data-media-main="tf_support_01">
         <div class="panel-media media-tf-support"></div>
         <div class="panel-content split-content">
           <article class="paper-card anim-card">
@@ -230,14 +227,17 @@
               I chose Take Five by The Dave Brubeck Quartet. It’s often described as cool jazz from the Time Out era (1959). The name comes from its unusual 5/4 time signature, but what’s impressive is that it still feels smooth and clean. It’s different without sounding messy.
             </p>
           </article>
-          <figure class="panel-figure parallax-soft" aria-hidden="true">
-            <img src="assets/tf_support_01.webp" alt="" loading="lazy" />
+          <figure class="panel-figure tf-why-media parallax-soft" aria-hidden="true">
+            <img class="media-node" data-media-slot="main" alt="" loading="lazy" />
           </figure>
         </div>
       </section>
 
-      <section class="panel theme-tf panel-tf-words" id="section-11" data-index="11" data-chapter="take-five" style="--bg-image:url('assets/tf_support_02.webp')">
+      <section class="panel theme-tf panel-tf-words" id="section-11" data-index="11" data-chapter="take-five" data-media-bg="tf_support_02" data-media-stamp="fiveextra">
         <div class="panel-media media-tf-support"></div>
+        <figure class="stamp-media stamp-left parallax-soft" aria-hidden="true">
+          <img class="media-node" data-media-slot="stamp" alt="" loading="lazy" />
+        </figure>
         <div class="panel-content centered-card">
           <article class="paper-card anim-card">
             <h3 class="question-title anim-heading">How can a song with no words say so much?</h3>
@@ -248,7 +248,7 @@
         </div>
       </section>
 
-      <section class="panel theme-tf panel-tf-diff" id="section-12" data-index="12" data-chapter="take-five" style="--bg-image:url('assets/tf_support_02.webp')">
+      <section class="panel theme-tf panel-tf-diff" id="section-12" data-index="12" data-chapter="take-five" data-media-bg="tf_support_02">
         <div class="panel-media media-tf-support"></div>
         <div class="panel-content centered-card diff-center">
           <article class="paper-card anim-card">
@@ -259,18 +259,14 @@
             <p>
               That represents how I like to do things differently. I do not want to add extra details just to impress people. I would rather use the tools I have intentionally and make a few details really strong. I like staying within what still feels normal, while adding something that makes it quietly stand out.
             </p>
-            <div class="ticks-row" aria-label="5 over 4 reveal">
-              <span class="tick"></span>
-              <span class="tick"></span>
-              <span class="tick"></span>
-              <span class="tick"></span>
-              <span class="tick tick-five" id="tickFive"></span>
-            </div>
           </article>
         </div>
       </section>
 
-      <section class="panel theme-tf panel-tf-now" id="section-13" data-index="13" data-chapter="take-five">
+      <section class="panel theme-tf panel-tf-now" id="section-13" data-index="13" data-chapter="take-five" data-media-stamp="cover_timeout">
+        <figure class="stamp-media stamp-right parallax-soft" aria-hidden="true">
+          <img class="media-node" data-media-slot="stamp" alt="" loading="lazy" />
+        </figure>
         <div class="panel-content centered-card">
           <article class="paper-card anim-card">
             <h3 class="question-title anim-heading">Does it match how I live now, or who I want to be?</h3>
@@ -281,7 +277,7 @@
         </div>
       </section>
 
-      <section class="panel theme-bw-light panel-together" id="section-14" data-index="14" data-chapter="take-five">
+      <section class="panel theme-bw-light panel-together" id="section-14" data-index="14" data-chapter="take-five" data-media-together-a="cover_graduation" data-media-together-b="cover_timeout">
         <div class="panel-content split-content together-layout">
           <article class="compare-wrap anim-card">
             <h3 class="question-title anim-heading">Why these two songs together?</h3>
@@ -293,9 +289,8 @@
             </p>
           </article>
           <figure class="together-collage parallax-soft" aria-hidden="true">
-            <img class="together-a" src="assets/cover_graduation.webp" alt="" loading="lazy" />
-            <img class="together-b" src="assets/cover_timeout.webp" alt="" loading="lazy" />
-            <img class="together-c" src="assets/tf_support_01.webp" alt="" loading="lazy" />
+            <img class="together-a media-node" data-media-slot="together-a" alt="" loading="lazy" />
+            <img class="together-b media-node" data-media-slot="together-b" alt="" loading="lazy" />
           </figure>
         </div>
       </section>
@@ -308,7 +303,7 @@
         </div>
       </section>
 
-      <section class="panel theme-bw-light panel-sources" id="section-16" data-index="16" data-chapter="sources">
+      <section class="panel theme-bw-light panel-sources" id="section-16" data-index="16" data-chapter="sources" data-media-src-a="cover_graduation" data-media-src-b="cover_timeout" data-media-src-c="extragraduation" data-media-src-d="fiveextra">
         <div class="panel-content sources-grid anim-card">
           <div class="sources-links">
             <h3 class="section-title anim-heading">Sources</h3>
@@ -320,9 +315,10 @@
           </div>
 
           <figure class="sources-collage parallax-soft" aria-hidden="true">
-            <img class="src-a" src="assets/cover_graduation.webp" alt="" loading="lazy" />
-            <img class="src-b" src="assets/cover_timeout.webp" alt="" loading="lazy" />
-            <img class="src-c" src="assets/tf_support_02.webp" alt="" loading="lazy" />
+            <img class="src-a media-node" data-media-slot="src-a" alt="" loading="lazy" />
+            <img class="src-b media-node" data-media-slot="src-b" alt="" loading="lazy" />
+            <img class="src-c media-node" data-media-slot="src-c" alt="" loading="lazy" />
+            <img class="src-d media-node" data-media-slot="src-d" alt="" loading="lazy" />
           </figure>
         </div>
       </section>
