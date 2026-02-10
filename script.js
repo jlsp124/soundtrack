@@ -9,24 +9,21 @@
 
   const sideRail = document.getElementById("sideRail");
   const menuToggle = document.getElementById("menuToggle");
-  const railScrim = document.getElementById("railScrim");
+  const railTitle = sideRail?.querySelector(".rail-title");
   const progressFill = document.getElementById("edgeProgressFill");
 
   const railItems = Array.from(document.querySelectorAll(".rail-item"));
   const subItems = Array.from(document.querySelectorAll(".rail-subitem"));
   const jumpLinks = [...railItems, ...subItems];
 
-  const headings = Array.from(document.querySelectorAll(".anim-heading"));
-  const cards = Array.from(document.querySelectorAll(".anim-card"));
-  const lines = Array.from(document.querySelectorAll(".anim-line"));
+  const revealTargets = new Map();
   const mediaLayers = Array.from(document.querySelectorAll(".panel-media"));
-  const parallaxItems = Array.from(document.querySelectorAll(".parallax-soft"));
+  let parallaxItems = Array.from(document.querySelectorAll("[data-parallax]"));
   const paperCards = Array.from(document.querySelectorAll(".paper-card"));
   const heroPortrait = document.querySelector(".hero-portrait img");
   const heroPortraitFrame = document.querySelector(".hero-portrait");
-  const collageImages = Array.from(document.querySelectorAll(".cover-collage img, .sources-collage img, .together-collage img"));
+  const collageImages = Array.from(document.querySelectorAll(".cover-collage img, .together-collage img, .sources-covers-grid img"));
   const images = Array.from(document.querySelectorAll("img"));
-  const revealMedia = Array.from(document.querySelectorAll(".reveal-media"));
 
   const MEDIA_MAP = {
     cover_graduation: "assets/cover_graduation.webp",
@@ -36,6 +33,7 @@
     gm_support_01: "assets/gm_support_01.webp",
     gm_support_02: "assets/gm_support_02.webp",
     gm_hero: "assets/gm_hero.webp",
+    tf_hero: "assets/tf_hero.webp",
     tf_support_01: "assets/tf_support_01.webp",
     tf_support_02: "assets/tf_support_02.webp"
   };
@@ -124,8 +122,8 @@
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-  const collapsedRailWidth = () => (window.matchMedia("(max-width: 900px)").matches ? 76 : 92);
-  const expandedRailWidth = () => (window.matchMedia("(max-width: 900px)").matches ? Math.min(window.innerWidth * 0.88, 320) : 320);
+  const collapsedRailWidth = () => 72;
+  const expandedRailWidth = () => (window.matchMedia("(max-width: 900px)").matches ? Math.min(window.innerWidth * 0.88, 320) : 332);
 
   const distanceX = () => Math.max(0, track.scrollWidth - window.innerWidth);
 
@@ -155,18 +153,28 @@
     return "sources";
   };
 
+  const chapterAccent = (chapter) => {
+    if (chapter === "good-morning") return "#ffb347";
+    if (chapter === "take-five") return "#a15c4a";
+    return "#d9d9dd";
+  };
+
   const setActiveNav = (index) => {
     const chapter = chapterFromIndex(index);
+    body.dataset.chapter = chapter;
+    body.style.setProperty("--accent", chapterAccent(chapter));
 
     railItems.forEach((button) => {
       button.classList.toggle("is-active", button.dataset.chapter === chapter);
     });
 
     subItems.forEach((button) => {
-      button.classList.toggle("is-current", Number(button.dataset.targetIndex) === index);
+      const buttonIndex = Number(button.dataset.index || button.dataset.targetIndex || "-1");
+      button.classList.toggle("is-current", buttonIndex === index);
     });
   };
 
+  // Master story progress (0..1) drives the vertical rail fill.
   const updateProgressBar = (progress) => {
     if (!progressFill) return;
     const value = clamp(progress, 0, 1);
@@ -247,6 +255,30 @@
     });
   };
 
+  const seedParallaxAttributes = () => {
+    // Keep data-driven parallax controls consistent across figures, cards, lines, and background glows.
+    mediaLayers.forEach((layer, idx) => {
+      if (!layer.dataset.parallax) layer.dataset.parallax = idx % 2 ? "soft" : "med";
+      if (!layer.dataset.parallaxAxis) layer.dataset.parallaxAxis = "x";
+    });
+
+    paperCards.forEach((card, idx) => {
+      if (!card.dataset.parallax) card.dataset.parallax = idx % 2 ? "soft" : "med";
+      if (!card.dataset.parallaxAxis) card.dataset.parallaxAxis = "x";
+    });
+
+    parallaxItems = Array.from(document.querySelectorAll("[data-parallax]"));
+  };
+
+  const getParallaxConfig = (element, idx) => {
+    const amountKey = (element.dataset.parallax || "soft").toLowerCase();
+    const axis = (element.dataset.parallaxAxis || "xy").toLowerCase();
+    const amount = amountKey === "hard" ? 26 : amountKey === "med" ? 17 : 10;
+    const sign = idx % 2 ? -1 : 1;
+
+    return { amount, axis, sign };
+  };
+
   const clearParallaxStyles = () => {
     [...mediaLayers, ...parallaxItems, ...paperCards].forEach((element) => {
       element.style.transform = "";
@@ -266,7 +298,7 @@
       img.addEventListener(
         "error",
         () => {
-          const holder = img.closest(".hero-portrait, .panel-figure, .cover-collage, .sources-collage, .together-collage, .stamp-media");
+          const holder = img.closest(".hero-portrait, .panel-figure, .cover-collage, .sources-covers-grid, .together-collage");
           if (holder) {
             if (holder.classList.contains("hero-portrait")) {
               holder.style.display = "none";
@@ -289,6 +321,35 @@
         },
         { once: true }
       );
+    });
+  };
+
+  const applyImageSafety = (img) => {
+    const container = img.closest(".media-card, .panel-figure");
+    if (!container) return;
+
+    const width = img.naturalWidth || 0;
+    const height = img.naturalHeight || 0;
+    if (!width || !height) return;
+
+    const imageRatio = width / height;
+    const rect = container.getBoundingClientRect();
+    const containerRatio = rect.width > 0 && rect.height > 0 ? rect.width / rect.height : 1;
+
+    // Portrait image inside wide container: enforce contain to prevent accidental clipping.
+    if (imageRatio < 0.95 && containerRatio > 1.06) {
+      img.style.objectFit = "contain";
+      img.style.objectPosition = "center";
+    }
+  };
+
+  const setupImageSafety = () => {
+    images.forEach((img) => {
+      if (img.complete) {
+        applyImageSafety(img);
+      } else {
+        img.addEventListener("load", () => applyImageSafety(img), { once: true });
+      }
     });
   };
 
@@ -482,20 +543,12 @@
   const updateNativeParallax = (y, maxX) => {
     const ratio = maxX > 0 ? y / maxX : 0;
 
-    mediaLayers.forEach((media, idx) => {
-      const drift = (idx % 2 ? -1 : 1) * ratio * 34;
-      media.style.transform = `translate3d(${drift}px, 0, 0) scale(1.1)`;
-    });
-
     parallaxItems.forEach((item, idx) => {
-      const dx = (idx % 2 ? -1 : 1) * ratio * 20;
-      const dy = (idx % 2 ? 1 : -1) * ratio * 14;
-      item.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
-    });
-
-    paperCards.forEach((card, idx) => {
-      const dy = (idx % 2 ? 1 : -1) * ratio * 10;
-      card.style.transform = `translate3d(0, ${dy}px, 0)`;
+      const config = getParallaxConfig(item, idx);
+      const dx = config.axis.includes("x") ? ratio * config.amount * config.sign : 0;
+      const dy = config.axis.includes("y") ? ratio * config.amount * 0.76 * -config.sign : 0;
+      const scale = item.classList.contains("panel-media") ? 1.04 + ratio * 0.08 : 1;
+      item.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
     });
 
     if (heroPortrait) {
@@ -638,43 +691,60 @@
     }
 
     initLenis();
+    const nonLineSelector = ".anim-heading, .anim-card, .media-card, .spotify-card, .compare-wrap, .sources-thumbs";
 
-    headings.forEach((heading, idx) => {
-      gsap.from(heading, {
-        x: idx % 2 ? 64 : 48,
-        autoAlpha: 0,
-        duration: 0.82,
+    revealTargets.clear();
+    panels.forEach((panel) => {
+      const nodes = Array.from(new Set(panel.querySelectorAll(nonLineSelector)));
+      revealTargets.set(panel, nodes);
+
+      if (Number(panel.dataset.index || "0") > 0) {
+        gsap.set(nodes, { autoAlpha: 0, y: 28 });
+      }
+    });
+
+    const animateIn = (panel) => {
+      const targets = revealTargets.get(panel) || [];
+      if (targets.length === 0) return;
+
+      gsap.killTweensOf(targets);
+      gsap.to(targets, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.74,
         ease: "power2.out",
-        scrollTrigger: {
-          trigger: heading.closest(".panel"),
-          containerAnimation: masterTween,
-          start: "left 74%",
-          toggleActions: "play none none reverse"
-        }
+        stagger: 0.055,
+        overwrite: true
+      });
+    };
+
+    const reset = (panel) => {
+      const targets = revealTargets.get(panel) || [];
+      if (targets.length === 0) return;
+      gsap.set(targets, { autoAlpha: 0, y: 28 });
+    };
+
+    animateIn(panels[0]);
+
+    // Panel entry animations are tied to the horizontal master so elements arrive as each panel enters view.
+    panels.forEach((panel) => {
+      ScrollTrigger.create({
+        trigger: panel,
+        containerAnimation: masterTween,
+        start: "left 70%",
+        end: "right 30%",
+        onEnter: () => animateIn(panel),
+        onEnterBack: () => animateIn(panel),
+        onLeaveBack: () => reset(panel)
       });
     });
 
-    cards.forEach((card) => {
-      gsap.from(card, {
-        y: 28,
-        autoAlpha: 0,
-        duration: 0.76,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: card.closest(".panel"),
-          containerAnimation: masterTween,
-          start: "left 76%",
-          toggleActions: "play none none reverse"
-        }
-      });
-    });
-
-    lines.forEach((line, idx) => {
+    Array.from(document.querySelectorAll(".anim-line")).forEach((line, idx) => {
       gsap.from(line, {
         scaleX: 0,
-        transformOrigin: idx % 2 ? "right center" : "left center",
         autoAlpha: 0,
-        duration: 0.95,
+        duration: 0.82,
+        transformOrigin: idx % 2 ? "right center" : "left center",
         ease: "power2.out",
         scrollTrigger: {
           trigger: line.closest(".panel"),
@@ -685,14 +755,15 @@
       });
     });
 
-    revealMedia.forEach((item) => {
+    Array.from(document.querySelectorAll(".reveal-media")).forEach((item) => {
       gsap.fromTo(
         item,
         { clipPath: "inset(0 0 100% 0)" },
         {
           clipPath: "inset(0 0 0% 0)",
-          duration: 1,
+          duration: 0.94,
           ease: "power2.out",
+          immediateRender: false,
           scrollTrigger: {
             trigger: item.closest(".panel"),
             containerAnimation: masterTween,
@@ -703,91 +774,28 @@
       );
     });
 
-    mediaLayers.forEach((media, idx) => {
-      gsap.fromTo(
-        media,
-        { xPercent: 0, scale: 1.04 },
-        {
-          xPercent: idx % 2 ? 8 : -8,
-          scale: 1.14,
-          ease: "none",
-          scrollTrigger: {
-            trigger: media.closest(".panel"),
-            containerAnimation: masterTween,
-            start: "left right",
-            end: "right left",
-            scrub: true
-          }
-        }
-      );
-    });
-
     parallaxItems.forEach((item, idx) => {
+      const panel = item.closest(".panel");
+      if (!panel) return;
+
+      const config = getParallaxConfig(item, idx);
+      const fromX = config.axis.includes("x") ? -config.sign * config.amount * 0.24 : 0;
+      const toX = config.axis.includes("x") ? config.sign * config.amount : 0;
+      const fromY = config.axis.includes("y") ? config.sign * config.amount * 0.18 : 0;
+      const toY = config.axis.includes("y") ? -config.sign * config.amount * 0.9 : 0;
+      const fromScale = item.classList.contains("panel-media") ? 1.03 : 1;
+      const toScale = item.classList.contains("panel-media") ? 1.12 : 1;
+
       gsap.fromTo(
         item,
-        { xPercent: idx % 2 ? -2 : 2, yPercent: idx % 2 ? 2 : -2 },
+        { x: fromX, y: fromY, scale: fromScale },
         {
-          xPercent: idx % 2 ? 6 : -6,
-          yPercent: idx % 2 ? -10 : 10,
+          x: toX,
+          y: toY,
+          scale: toScale,
           ease: "none",
           scrollTrigger: {
-            trigger: item.closest(".panel"),
-            containerAnimation: masterTween,
-            start: "left right",
-            end: "right left",
-            scrub: true
-          }
-        }
-      );
-    });
-
-    paperCards.forEach((card, idx) => {
-      gsap.fromTo(
-        card,
-        { yPercent: idx % 2 ? 2 : -2 },
-        {
-          yPercent: idx % 2 ? -2 : 2,
-          ease: "none",
-          scrollTrigger: {
-            trigger: card.closest(".panel"),
-            containerAnimation: masterTween,
-            start: "left right",
-            end: "right left",
-            scrub: true
-          }
-        }
-      );
-    });
-
-    if (heroPortrait) {
-      gsap.fromTo(
-        heroPortrait,
-        { xPercent: -2, scale: 1.02 },
-        {
-          xPercent: 6,
-          scale: 1.08,
-          ease: "none",
-          scrollTrigger: {
-            trigger: "#section-0",
-            containerAnimation: masterTween,
-            start: "left right",
-            end: "right left",
-            scrub: true
-          }
-        }
-      );
-    }
-
-    collageImages.forEach((image, idx) => {
-      gsap.fromTo(
-        image,
-        { yPercent: idx % 2 ? 1 : -1 },
-        {
-          yPercent: idx % 2 ? -8 : 8,
-          xPercent: idx % 2 ? 4 : -4,
-          ease: "none",
-          scrollTrigger: {
-            trigger: image.closest(".panel"),
+            trigger: panel,
             containerAnimation: masterTween,
             start: "left right",
             end: "right left",
@@ -844,7 +852,7 @@
     updateDebugOverlay();
   };
 
-  const jumpToPanel = (rawIndex) => {
+  const jumpToIndex = (rawIndex) => {
     const idx = clamp(Number(rawIndex), 0, panels.length - 1);
     if (Number.isNaN(idx)) return;
 
@@ -874,15 +882,12 @@
 
   const onRailClosed = () => {
     body.classList.remove("rail-open");
-    if (railScrim) {
-      railScrim.hidden = true;
-    }
 
     if (window.gsap) {
       window.gsap.set(sideRail, { clearProps: "width" });
-      window.gsap.set(subItems, { clearProps: "opacity,transform" });
+      window.gsap.set([...railItems, ...subItems], { clearProps: "opacity,transform" });
     } else {
-      subItems.forEach((item) => {
+      [...railItems, ...subItems].forEach((item) => {
         item.style.opacity = "";
         item.style.transform = "";
       });
@@ -902,30 +907,55 @@
       railTimeline = null;
     }
 
-    gsap.set(subItems, { autoAlpha: 0, y: 14 });
+    gsap.set(railItems, { autoAlpha: 0, x: -10 });
+    gsap.set(subItems, { autoAlpha: 0, y: 12 });
 
+    // Single timeline controls both open and close for perfectly matched timing.
     railTimeline = gsap.timeline({ paused: true });
     railTimeline
       .to(
         sideRail,
         {
           width: () => expandedRailWidth(),
-          duration: 0.58,
-          ease: "power3.out"
+          duration: 0.46,
+          ease: "power2.inOut"
         },
         0
+      )
+      .to(
+        railItems,
+        {
+          autoAlpha: 1,
+          x: 0,
+          stagger: 0.03,
+          duration: 0.28,
+          ease: "power2.out"
+        },
+        0.12
       )
       .to(
         subItems,
         {
           autoAlpha: 1,
           y: 0,
-          stagger: 0.03,
-          duration: 0.34,
+          stagger: 0.02,
+          duration: 0.24,
           ease: "power2.out"
         },
-        0.18
+        0.2
       );
+
+    if (railTitle) {
+      railTimeline.to(
+        railTitle,
+        {
+          x: 0,
+          duration: 0.46,
+          ease: "power2.inOut"
+        },
+        0
+      );
+    }
   };
 
   const openRail = () => {
@@ -933,10 +963,6 @@
 
     body.classList.add("rail-open");
     menuToggle?.setAttribute("aria-expanded", "true");
-
-    if (railScrim) {
-      railScrim.hidden = false;
-    }
 
     if (window.gsap && !reducedMotion) {
       if (!railTimeline) {
@@ -946,6 +972,10 @@
       window.gsap.set(sideRail, { width: collapsedRailWidth() });
       railTimeline?.play(0);
     } else {
+      railItems.forEach((item) => {
+        item.style.opacity = "1";
+        item.style.transform = "translateX(0)";
+      });
       subItems.forEach((item) => {
         item.style.opacity = "1";
         item.style.transform = "translateY(0)";
@@ -977,7 +1007,7 @@
 
   jumpLinks.forEach((button) => {
     button.addEventListener("click", () => {
-      jumpToPanel(button.dataset.targetIndex || "0");
+      jumpToIndex(button.dataset.index || button.dataset.targetIndex || "0");
       if (body.classList.contains("rail-open")) {
         closeRail();
       }
@@ -985,7 +1015,6 @@
   });
 
   menuToggle?.addEventListener("click", toggleRail);
-  railScrim?.addEventListener("click", closeRail);
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && body.classList.contains("rail-open")) {
@@ -1017,6 +1046,7 @@
     if (body.classList.contains("rail-open") && window.gsap) {
       buildRailTimeline();
       window.gsap.set(sideRail, { width: expandedRailWidth() });
+      window.gsap.set(railItems, { autoAlpha: 1, x: 0 });
       window.gsap.set(subItems, { autoAlpha: 1, y: 0 });
     }
 
@@ -1036,8 +1066,13 @@
   });
 
   const boot = async () => {
+    // Rubric chips stay hidden unless explicitly enabled with ?rubric=on.
+    body.dataset.rubric = new URLSearchParams(window.location.search).get("rubric") === "on" ? "on" : "off";
+
     setupImageFallbacks();
     setPanelMediaSlots();
+    seedParallaxAttributes();
+    setupImageSafety();
 
     motionSetting = resolveMotionSetting();
     reducedMotion = computeReducedMotion();
@@ -1051,6 +1086,7 @@
 
     buildRailTimeline();
     initializeEngine();
+    console.log("GSAP", !!window.gsap, "ST", !!window.ScrollTrigger, "Lenis", !!window.Lenis);
   };
 
   if (document.readyState === "loading") {
