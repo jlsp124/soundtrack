@@ -9,12 +9,21 @@
 
   const sideRail = document.getElementById("sideRail");
   const menuToggle = document.getElementById("menuToggle");
-  const railTitle = sideRail?.querySelector(".rail-title");
   const progressFill = document.getElementById("edgeProgressFill");
 
   const railItems = Array.from(document.querySelectorAll(".rail-item"));
   const subItems = Array.from(document.querySelectorAll(".rail-subitem"));
   const jumpLinks = [...railItems, ...subItems];
+
+  const commentsList = document.getElementById("commentsList");
+  const commentsForm = document.getElementById("commentsForm");
+  const commentsStatus = document.getElementById("commentsStatus");
+  const commentsConfigMsg = document.getElementById("commentsConfigMsg");
+  const commentName = document.getElementById("commentName");
+  const commentMessage = document.getElementById("commentMessage");
+  const commentWebsite = document.getElementById("commentWebsite");
+  const commentsSubmit = document.getElementById("commentsSubmit");
+  const commentsApiMeta = document.querySelector('meta[name="comments-api"]');
 
   const revealTargets = new Map();
   const mediaLayers = Array.from(document.querySelectorAll(".panel-media"));
@@ -45,6 +54,10 @@
   const MOTION_KEY = "soundtrack.motion";
   const allowedMotion = new Set(["on", "off", "auto"]);
   const debugEnabled = new URLSearchParams(window.location.search).get("debug") === "1";
+  const COMMENTS_LIMIT = 20;
+  const COMMENTS_COOLDOWN_MS = 10000;
+  const commentsApiBase = (commentsApiMeta?.content || "").trim().replace(/\/+$/, "");
+  const commentsConfigured = commentsApiBase !== "" && !/FILL_ME/i.test(commentsApiBase);
 
   const reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -62,6 +75,10 @@
   let railTimeline = null;
 
   let verticalProgressHandler = null;
+  let commentsData = [];
+  let commentsPosting = false;
+  let commentsCooldownUntil = 0;
+  let commentsCooldownTimer = 0;
 
   const nativeState = {
     active: false,
@@ -155,14 +172,16 @@
 
   const chapterAccent = (chapter) => {
     if (chapter === "good-morning") return "#ffb347";
-    if (chapter === "take-five") return "#a15c4a";
-    return "#d9d9dd";
+    if (chapter === "take-five") return "#8b4f43";
+    return "#f2f2f4";
   };
 
   const setActiveNav = (index) => {
     const chapter = chapterFromIndex(index);
+    const accent = chapterAccent(chapter);
     body.dataset.chapter = chapter;
-    body.style.setProperty("--accent", chapterAccent(chapter));
+    body.style.setProperty("--accent", accent);
+    body.style.setProperty("--rail-accent", accent);
 
     railItems.forEach((button) => {
       button.classList.toggle("is-active", button.dataset.chapter === chapter);
@@ -349,6 +368,222 @@
         applyImageSafety(img);
       } else {
         img.addEventListener("load", () => applyImageSafety(img), { once: true });
+      }
+    });
+  };
+
+  const commentsUrl = (path) => `${commentsApiBase}${path}`;
+
+  const setCommentsStatus = (message, state) => {
+    if (!commentsStatus) return;
+    commentsStatus.textContent = message || "";
+    commentsStatus.dataset.state = state || "";
+  };
+
+  const formatCommentDate = (value) => {
+    const date = new Date(value || "");
+    if (Number.isNaN(date.getTime())) return "just now";
+    return date.toLocaleString([], {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
+  };
+
+  const renderComments = (items) => {
+    if (!commentsList) return;
+    commentsList.textContent = "";
+
+    if (!Array.isArray(items) || items.length === 0) {
+      const empty = document.createElement("li");
+      empty.className = "comment-empty";
+      empty.textContent = "No comments yet.";
+      commentsList.appendChild(empty);
+      return;
+    }
+
+    items.slice(0, COMMENTS_LIMIT).forEach((entry) => {
+      const item = document.createElement("li");
+      item.className = "comment-item";
+
+      const top = document.createElement("div");
+      top.className = "comment-top";
+
+      const nameNode = document.createElement("strong");
+      nameNode.className = "comment-name";
+      nameNode.textContent = entry.name || "Anonymous";
+
+      const dateNode = document.createElement("span");
+      dateNode.className = "comment-date";
+      dateNode.textContent = formatCommentDate(entry.created_at);
+
+      const messageNode = document.createElement("p");
+      messageNode.className = "comment-message";
+      messageNode.textContent = entry.message || "";
+
+      top.append(nameNode, dateNode);
+      item.append(top, messageNode);
+      commentsList.appendChild(item);
+    });
+  };
+
+  const updateCommentsSubmitState = () => {
+    if (!commentsSubmit) return;
+    const remainingMs = Math.max(0, commentsCooldownUntil - Date.now());
+    const coolingDown = remainingMs > 0;
+    commentsSubmit.disabled = !commentsConfigured || commentsPosting || coolingDown;
+
+    if (commentsPosting) {
+      commentsSubmit.textContent = "Posting...";
+      return;
+    }
+
+    if (coolingDown) {
+      commentsSubmit.textContent = `Wait ${Math.ceil(remainingMs / 1000)}s`;
+      return;
+    }
+
+    commentsSubmit.textContent = "Post comment";
+  };
+
+  const startCommentsCooldown = () => {
+    commentsCooldownUntil = Date.now() + COMMENTS_COOLDOWN_MS;
+    if (commentsCooldownTimer) window.clearInterval(commentsCooldownTimer);
+
+    commentsCooldownTimer = window.setInterval(() => {
+      if (Date.now() >= commentsCooldownUntil) {
+        window.clearInterval(commentsCooldownTimer);
+        commentsCooldownTimer = 0;
+      }
+      updateCommentsSubmitState();
+    }, 250);
+
+    updateCommentsSubmitState();
+  };
+
+  const loadComments = async () => {
+    if (!commentsConfigured || !commentsList) return;
+
+    try {
+      const response = await window.fetch(commentsUrl(`/api/comments?limit=${COMMENTS_LIMIT}`), {
+        method: "GET"
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const payload = await response.json();
+      commentsData = Array.isArray(payload.comments) ? payload.comments : [];
+      renderComments(commentsData);
+      setCommentsStatus("", "");
+    } catch (_error) {
+      commentsData = [];
+      renderComments(commentsData);
+      setCommentsStatus("Could not load comments right now.", "error");
+    }
+  };
+
+  const initComments = () => {
+    if (!commentsList || !commentsForm) return;
+
+    commentsConfigMsg?.removeAttribute("hidden");
+    renderComments([]);
+
+    if (!commentsConfigured) {
+      setCommentsStatus("Comments not configured.", "error");
+      [commentName, commentMessage, commentWebsite, commentsSubmit].forEach((field) => {
+        if (field) field.disabled = true;
+      });
+      return;
+    }
+
+    if (commentsConfigMsg) commentsConfigMsg.hidden = true;
+    [commentName, commentMessage, commentWebsite, commentsSubmit].forEach((field) => {
+      if (field) field.disabled = false;
+    });
+
+    updateCommentsSubmitState();
+    loadComments();
+
+    commentsForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!commentsConfigured || commentsPosting) return;
+
+      const nameRaw = (commentName?.value || "").trim();
+      const messageRaw = (commentMessage?.value || "").trim();
+      const hpValue = (commentWebsite?.value || "").trim();
+      const cooldownMs = commentsCooldownUntil - Date.now();
+
+      if (cooldownMs > 0) {
+        setCommentsStatus(`Please wait ${Math.ceil(cooldownMs / 1000)}s before posting again.`, "error");
+        updateCommentsSubmitState();
+        return;
+      }
+
+      if (messageRaw.length < 3 || messageRaw.length > 500) {
+        setCommentsStatus("Comment must be between 3 and 500 characters.", "error");
+        return;
+      }
+
+      if (nameRaw.length > 30) {
+        setCommentsStatus("Name must be 30 characters or fewer.", "error");
+        return;
+      }
+
+      const previous = commentsData.slice();
+      const optimistic = {
+        id: `tmp-${Date.now()}`,
+        name: nameRaw,
+        message: messageRaw,
+        created_at: new Date().toISOString()
+      };
+
+      commentsPosting = true;
+      setCommentsStatus("Posting comment...", "");
+      commentsData = [optimistic, ...previous].slice(0, COMMENTS_LIMIT);
+      renderComments(commentsData);
+      updateCommentsSubmitState();
+
+      try {
+        const response = await window.fetch(commentsUrl("/api/comments"), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: nameRaw,
+            message: messageRaw,
+            hp: hpValue
+          })
+        });
+
+        const payload = await response.json().catch(() => ({}));
+
+        if (!response.ok || !payload.ok) {
+          throw new Error(payload.error || `HTTP ${response.status}`);
+        }
+
+        if (payload.comment) {
+          commentsData = [payload.comment, ...previous].slice(0, COMMENTS_LIMIT);
+          renderComments(commentsData);
+        } else {
+          commentsData = previous;
+          renderComments(commentsData);
+        }
+
+        if (commentMessage) commentMessage.value = "";
+        if (commentWebsite) commentWebsite.value = "";
+        setCommentsStatus("Thanks. Your comment was posted.", "ok");
+        startCommentsCooldown();
+      } catch (error) {
+        commentsData = previous;
+        renderComments(commentsData);
+        setCommentsStatus(error.message || "Could not post comment.", "error");
+      } finally {
+        commentsPosting = false;
+        updateCommentsSubmitState();
       }
     });
   };
@@ -945,17 +1180,6 @@
         0.2
       );
 
-    if (railTitle) {
-      railTimeline.to(
-        railTitle,
-        {
-          x: 0,
-          duration: 0.46,
-          ease: "power2.inOut"
-        },
-        0
-      );
-    }
   };
 
   const openRail = () => {
@@ -1073,6 +1297,7 @@
     setPanelMediaSlots();
     seedParallaxAttributes();
     setupImageSafety();
+    initComments();
 
     motionSetting = resolveMotionSetting();
     reducedMotion = computeReducedMotion();

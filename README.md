@@ -112,3 +112,56 @@ When reduced mode is active:
 - GSAP horizontal engine is not used.
 - Layout switches to vertical stack via `.reduced-motion` styles.
 - Navigation and progress bar continue working.
+
+## Deploy comments worker (no account required for commenters)
+
+The site now includes a comments panel that reads from a Cloudflare Worker API.
+Commenters do not need GitHub accounts.
+
+### 1. Create D1 database
+
+```bash
+cd comments-worker
+wrangler d1 create soundtrack-comments
+```
+
+Copy the returned `database_id` into `comments-worker/wrangler.toml`.
+
+### 2. Apply schema
+
+```bash
+wrangler d1 execute soundtrack-comments --file=./schema.sql
+```
+
+### 3. Create KV namespace for rate limiting
+
+```bash
+wrangler kv namespace create RATE_LIMIT
+```
+
+Copy the returned namespace `id` into `comments-worker/wrangler.toml`.
+
+### 4. Verify allowed origins
+
+`comments-worker/wrangler.toml` includes:
+
+- `https://jlsp124.github.io`
+- `http://127.0.0.1:5500`
+
+Adjust `ALLOWED_ORIGINS` if needed.
+
+### 5. Deploy worker
+
+```bash
+wrangler deploy
+```
+
+### 6. Connect the static site to the worker
+
+In `index.html`, set:
+
+```html
+<meta name="comments-api" content="https://YOUR-WORKER.your-subdomain.workers.dev" />
+```
+
+If this meta tag is left as `___FILL_ME___`, the comments panel stays disabled and shows `Comments not configured.`

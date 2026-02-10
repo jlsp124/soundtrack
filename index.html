@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Personal Soundtrack</title>
   <meta name="description" content="CLE 10 soundtrack narrative website" />
+  <meta name="comments-api" content="___FILL_ME___" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bodoni+Moda:opsz,wght@6..96,600;6..96,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -23,7 +24,6 @@
         <img class="icon-open" src="assets/ui_burger.svg" alt="" aria-hidden="true" />
         <img class="icon-close" src="assets/ui_close.svg" alt="" aria-hidden="true" />
       </button>
-      <span class="rail-title">SOUNDTRACK</span>
     </div>
 
     <nav class="rail-nav rail-groups" aria-label="Chapter navigation">
@@ -71,9 +71,18 @@
         <button class="rail-item" data-target-index="16" data-index="16" data-chapter="sources">SOURCES</button>
         <div class="rail-subnav">
           <button class="rail-subitem" data-target-index="16" data-index="16">Links</button>
+          <button class="rail-subitem" data-target-index="17" data-index="17">Comments</button>
         </div>
       </section>
     </nav>
+
+    <div class="rail-bottom">
+      <span class="rail-title">SOUNDTRACK</span>
+      <div class="rail-bottom-icons" aria-hidden="true">
+        <img class="rail-mini-icon" src="assets/ui_wave.svg" alt="" />
+        <span class="rail-mini-dot"></span>
+      </div>
+    </div>
   </aside>
 
   <main id="horizontalShell" class="horizontal-shell">
@@ -343,6 +352,44 @@
               <img class="src-c media-node" data-media-slot="src-c" src="assets/extragraduation.webp" alt="" loading="lazy" />
               <img class="src-d media-node" data-media-slot="src-d" src="assets/fiveextra.webp" alt="" loading="lazy" />
             </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel theme-bw-dark panel-comments" id="section-17" data-index="17" data-chapter="sources">
+        <div class="panel-content comments-wrap anim-card">
+          <div class="comments-head">
+            <h3 class="section-title anim-heading">Comments</h3>
+            <p class="comments-subtitle">Leave feedback (no account needed).</p>
+          </div>
+
+          <p class="comments-config-msg" id="commentsConfigMsg" hidden>Comments not configured.</p>
+
+          <div class="comments-grid">
+            <div class="comments-list-wrap">
+              <h4 class="comments-label">Latest</h4>
+              <ul class="comments-list" id="commentsList" aria-live="polite"></ul>
+            </div>
+
+            <form class="comments-form" id="commentsForm" novalidate>
+              <label class="comments-field">
+                <span>Name</span>
+                <input id="commentName" name="name" type="text" maxlength="30" placeholder="Nickname (optional)" />
+              </label>
+
+              <label class="comments-field">
+                <span>Comment</span>
+                <textarea id="commentMessage" name="message" maxlength="500" minlength="3" rows="5" required></textarea>
+              </label>
+
+              <label class="comments-hp" aria-hidden="true">
+                <span>Website</span>
+                <input id="commentWebsite" name="website" type="text" tabindex="-1" autocomplete="off" />
+              </label>
+
+              <p class="comments-status" id="commentsStatus" role="status" aria-live="polite"></p>
+              <button class="comments-submit" id="commentsSubmit" type="submit">Post comment</button>
+            </form>
           </div>
         </div>
       </section>

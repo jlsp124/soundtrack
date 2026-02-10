@@ -1,0 +1,15 @@
+name = "soundtrack-comments"
+main = "src/worker.js"
+compatibility_date = "2026-02-10"
+
+[vars]
+ALLOWED_ORIGINS = "https://jlsp124.github.io,http://127.0.0.1:5500"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "soundtrack-comments"
+database_id = "__D1_DATABASE_ID__"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "__KV_NAMESPACE_ID__"
