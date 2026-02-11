@@ -1,6 +1,6 @@
 :root {
   --rail-collapsed: 72px;
-  --rail-expanded: 348px;
+  --rail-expanded: 364px;
   --rail-accent: #e8e8ea;
   --accent: #d9d9dd;
   --font-display: "Bebas Neue", sans-serif;
@@ -285,7 +285,7 @@ body.rail-open .rail-item {
   font-size: 0.84rem;
   letter-spacing: 0.11em;
   padding-left: 7px;
-  padding-right: 16px;
+  padding-right: 26px;
   line-height: 1.2;
   white-space: nowrap;
   opacity: 1;
@@ -305,7 +305,7 @@ body.rail-open .rail-item {
 .rail-item.is-active::after {
   content: "/";
   position: absolute;
-  right: 6px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   font-weight: 800;
@@ -1252,7 +1252,7 @@ body.reduced-motion .reveal-media {
 @media (max-width: 900px) {
   :root {
     --rail-collapsed: 56px;
-    --rail-expanded: min(92vw, 316px);
+    --rail-expanded: min(92vw, 332px);
   }
 
   .side-rail {

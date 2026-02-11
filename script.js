@@ -144,7 +144,7 @@
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
   const collapsedRailWidth = () => (mobileQuery.matches ? 56 : 72);
-  const expandedRailWidth = () => (mobileQuery.matches ? Math.min(window.innerWidth * 0.92, 316) : 348);
+  const expandedRailWidth = () => (mobileQuery.matches ? Math.min(window.innerWidth * 0.92, 332) : 364);
 
   const distanceX = () => Math.max(0, track.scrollWidth - window.innerWidth);
 
