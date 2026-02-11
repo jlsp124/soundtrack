@@ -294,7 +294,7 @@
   const getParallaxConfig = (element, idx) => {
     const amountKey = (element.dataset.parallax || "soft").toLowerCase();
     const axis = (element.dataset.parallaxAxis || "xy").toLowerCase();
-    const amount = amountKey === "hard" ? 26 : amountKey === "med" ? 17 : 10;
+    const amount = amountKey === "hard" ? 46 : amountKey === "med" ? 30 : 18;
     const sign = idx % 2 ? -1 : 1;
 
     return { amount, axis, sign };
@@ -796,21 +796,22 @@
 
     parallaxItems.forEach((item, idx) => {
       const config = getParallaxConfig(item, idx);
-      const dx = config.axis.includes("x") ? ratio * config.amount * config.sign : 0;
-      const dy = config.axis.includes("y") ? ratio * config.amount * 0.76 * -config.sign : 0;
-      const scale = item.classList.contains("panel-media") ? 1.04 + ratio * 0.08 : 1;
+      const dx = config.axis.includes("x") ? ratio * config.amount * 1.35 * config.sign : 0;
+      const dy = config.axis.includes("y") ? ratio * config.amount * 0.95 * -config.sign : 0;
+      const scale = item.classList.contains("panel-media") ? 1.05 + ratio * 0.14 : 1;
       item.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
     });
 
     if (heroPortrait) {
-      const scale = 1.02 + ratio * 0.06;
-      const x = ratio * 12;
+      const scale = 1.03 + ratio * 0.09;
+      const x = ratio * 22;
       heroPortrait.style.transform = `translate3d(${x}px, 0, 0) scale(${scale})`;
     }
 
     collageImages.forEach((image, idx) => {
-      const drift = (idx % 2 ? -1 : 1) * ratio * 12;
-      image.style.transform = `translate3d(${drift}px, 0, 0)`;
+      const driftX = (idx % 2 ? -1 : 1) * ratio * 20;
+      const driftY = (idx % 2 ? 1 : -1) * ratio * 8;
+      image.style.transform = `translate3d(${driftX}px, ${driftY}px, 0)`;
     });
   };
 
@@ -942,7 +943,7 @@
     }
 
     initLenis();
-    const nonLineSelector = ".anim-heading, .anim-card, .media-card, .spotify-card, .compare-wrap, .sources-thumbs";
+    const nonLineSelector = ".anim-heading, .anim-card, .media-card, .spotify-card, .compare-wrap";
 
     revealTargets.clear();
     panels.forEach((panel) => {
@@ -950,7 +951,8 @@
       revealTargets.set(panel, nodes);
 
       if (Number(panel.dataset.index || "0") > 0) {
-        gsap.set(nodes, { autoAlpha: 0, y: 28 });
+        const direction = Number(panel.dataset.index || "0") % 2 ? 1 : -1;
+        gsap.set(nodes, { autoAlpha: 0, y: 28, x: 34 * direction });
       }
     });
 
@@ -962,6 +964,7 @@
       gsap.to(targets, {
         autoAlpha: 1,
         y: 0,
+        x: 0,
         duration: 0.74,
         ease: "power2.out",
         stagger: 0.055,
@@ -972,10 +975,12 @@
     const animateOut = (panel, direction = 1) => {
       const targets = revealTargets.get(panel) || [];
       if (targets.length === 0) return;
+      const panelDirection = Number(panel.dataset.index || "0") % 2 ? 1 : -1;
       gsap.killTweensOf(targets);
       gsap.to(targets, {
         autoAlpha: 0,
         y: direction > 0 ? -18 : 18,
+        x: direction > 0 ? 30 * panelDirection : -30 * panelDirection,
         duration: 0.42,
         ease: "power1.in",
         stagger: 0.04,
@@ -1039,12 +1044,12 @@
       if (!panel) return;
 
       const config = getParallaxConfig(item, idx);
-      const fromX = config.axis.includes("x") ? -config.sign * config.amount * 0.24 : 0;
-      const toX = config.axis.includes("x") ? config.sign * config.amount : 0;
-      const fromY = config.axis.includes("y") ? config.sign * config.amount * 0.18 : 0;
-      const toY = config.axis.includes("y") ? -config.sign * config.amount * 0.9 : 0;
-      const fromScale = item.classList.contains("panel-media") ? 1.03 : 1;
-      const toScale = item.classList.contains("panel-media") ? 1.12 : 1;
+      const fromX = config.axis.includes("x") ? -config.sign * config.amount * 0.52 : 0;
+      const toX = config.axis.includes("x") ? config.sign * config.amount * 1.32 : 0;
+      const fromY = config.axis.includes("y") ? config.sign * config.amount * 0.36 : 0;
+      const toY = config.axis.includes("y") ? -config.sign * config.amount * 1.18 : 0;
+      const fromScale = item.classList.contains("panel-media") ? 1.04 : 1;
+      const toScale = item.classList.contains("panel-media") ? 1.18 : 1;
 
       gsap.fromTo(
         item,
