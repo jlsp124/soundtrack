@@ -248,7 +248,7 @@ body.rail-open .rail-title {
   margin-top: 6px;
   width: 100%;
   display: grid;
-  gap: 6px;
+  gap: 4px;
   padding-right: 2px;
   align-content: start;
   overflow: hidden;
@@ -256,7 +256,7 @@ body.rail-open .rail-title {
 
 .rail-group {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
-  padding-top: 6px;
+  padding-top: 4px;
 }
 
 .rail-item {
@@ -280,11 +280,14 @@ body.rail-open .rail-title {
 }
 
 body.rail-open .rail-item {
-  font-size: 0.76rem;
-  letter-spacing: 0.09em;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
   padding-left: 7px;
   padding-right: 16px;
-  line-height: 1.16;
+  line-height: 1.12;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
@@ -333,9 +336,9 @@ body.rail-open .rail-subnav {
   color: rgba(248, 248, 248, 0.72);
   text-align: left;
   font-family: var(--font-body);
-  font-size: 0.67rem;
-  line-height: 1.22;
-  padding: 4px 8px 4px 10px;
+  font-size: 0.62rem;
+  line-height: 1.16;
+  padding: 3px 8px 3px 10px;
   white-space: normal;
   word-break: break-word;
   cursor: pointer;
@@ -388,6 +391,17 @@ body.rail-open .rail-subnav {
   background: linear-gradient(130deg, rgba(8, 9, 12, 0.1), rgba(8, 9, 12, 0.36));
 }
 
+.panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(6, 7, 10, 0.28), transparent 16%, transparent 84%, rgba(6, 7, 10, 0.28));
+  mix-blend-mode: soft-light;
+  opacity: 0.72;
+}
+
 .panel-media {
   position: absolute;
   inset: 0;
@@ -409,44 +423,29 @@ body.rail-open .rail-subnav {
 }
 
 .theme-gm {
-  background: linear-gradient(135deg, var(--gm-purple), var(--gm-pink) 46%, var(--gm-cyan) 112%);
+  background: linear-gradient(142deg, #29128a 0%, #6b41e8 48%, #ff4fae 100%);
   color: var(--gm-cream);
 }
 
-.panel-gm-intro {
-  background: radial-gradient(circle at 76% 40%, rgba(35, 213, 255, 0.35), transparent 40%),
-    linear-gradient(135deg, #2f15ab, var(--gm-pink) 44%, var(--gm-gold) 108%);
-}
-
-.panel-spotify-gm {
-  background: linear-gradient(145deg, #25106a, #7847ff 46%, #ff3cac 100%);
-}
-
-.panel-gm-why {
-  background: linear-gradient(140deg, #4a1bff, #ff3cac 53%, #ffb703 116%);
-}
-
-.panel-gm-push {
-  background: linear-gradient(145deg, #23108f, #7847ff 46%, #23d5ff 110%);
-}
-
-.panel-gm-lyric {
-  background: linear-gradient(135deg, #2a139e, #ff3cac 52%, #23d5ff 118%);
-}
-
+.panel-gm-intro,
+.panel-spotify-gm,
+.panel-gm-why,
+.panel-gm-push,
+.panel-gm-lyric,
 .panel-gm-now {
-  background: linear-gradient(140deg, #1f0b76, #6f3dff 48%, #23d5ff 106%);
+  background: radial-gradient(circle at 78% 30%, rgba(255, 183, 3, 0.2), transparent 44%),
+    linear-gradient(142deg, #29128a 0%, #6b41e8 48%, #ff4fae 100%);
 }
 
 .theme-tf-intro {
-  background: radial-gradient(circle at 76% 34%, rgba(214, 162, 68, 0.3), transparent 42%),
-    linear-gradient(155deg, #08111f, #0e2740 54%, #123f50 100%);
+  background: radial-gradient(circle at 76% 26%, rgba(214, 162, 68, 0.24), transparent 44%),
+    linear-gradient(152deg, #08111f 0%, #0f2a3d 52%, #154455 100%);
   color: #eef5f8;
 }
 
 .theme-tf {
-  background: radial-gradient(circle at 78% 16%, rgba(214, 162, 68, 0.18), transparent 42%),
-    linear-gradient(150deg, var(--tf-navy), #0b2638 52%, var(--tf-teal) 100%);
+  background: radial-gradient(circle at 76% 26%, rgba(214, 162, 68, 0.2), transparent 44%),
+    linear-gradient(152deg, #08111f 0%, #0f2a3d 52%, #154455 100%);
   color: #edf3f6;
 }
 
@@ -1241,18 +1240,45 @@ body.reduced-motion .reveal-media {
 
 @media (max-width: 900px) {
   :root {
-    --rail-collapsed: 72px;
-    --rail-expanded: min(88vw, 320px);
+    --rail-collapsed: 56px;
+    --rail-expanded: min(92vw, 300px);
+  }
+
+  .side-rail {
+    padding: 10px 8px 12px;
+  }
+
+  .rail-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .rail-btn img {
+    width: 20px;
+    height: 20px;
   }
 
   .panel,
   .panel-wide {
     width: 100vw;
     flex-basis: 100vw;
+    padding: clamp(18px, 4vw, 30px) clamp(12px, 4vw, 20px) clamp(16px, 4vw, 26px) calc(var(--rail-collapsed) + 12px);
   }
 
   body.rail-open .rail-item {
-    font-size: 0.78rem;
+    font-size: 0.64rem;
+  }
+
+  .rail-subitem {
+    font-size: 0.58rem;
+  }
+
+  .chapter-support {
+    width: min(180px, 42vw);
+  }
+
+  .panel-figure.contain-media.fit-media {
+    width: min(420px, 74vw);
   }
 
   .comments-wrap {
