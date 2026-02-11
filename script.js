@@ -63,7 +63,6 @@
 
   const reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const mobileQuery = window.matchMedia("(max-width: 900px)");
-  const pointerFineQuery = window.matchMedia("(pointer: fine)");
 
   let motionSetting = "on";
   let reducedMotion = false;
@@ -91,14 +90,10 @@
     targetX: 0,
     scrollHandler: null,
     resizeHandler: null,
-    requestRender: null,
     raf: 0
   };
 
   let debugNode = null;
-  const mouseState = { x: 0, y: 0 };
-  let gsapMouseTargets = [];
-  let mouseRaf = 0;
 
   const safeStorageGet = (key) => {
     try {
@@ -149,7 +144,7 @@
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
   const collapsedRailWidth = () => (mobileQuery.matches ? 56 : 72);
-  const expandedRailWidth = () => (mobileQuery.matches ? Math.min(window.innerWidth * 0.92, 300) : 332);
+  const expandedRailWidth = () => (mobileQuery.matches ? Math.min(window.innerWidth * 0.92, 316) : 348);
 
   const distanceX = () => Math.max(0, track.scrollWidth - window.innerWidth);
 
@@ -301,7 +296,7 @@
   const getParallaxConfig = (element, idx) => {
     const amountKey = (element.dataset.parallax || "soft").toLowerCase();
     const axis = (element.dataset.parallaxAxis || "xy").toLowerCase();
-    const amount = amountKey === "hard" ? 46 : amountKey === "med" ? 30 : 18;
+    const amount = amountKey === "hard" ? 34 : amountKey === "med" ? 22 : 12;
     const sign = idx % 2 ? -1 : 1;
 
     return { amount, axis, sign };
@@ -319,113 +314,6 @@
     collageImages.forEach((image) => {
       image.style.transform = "";
     });
-  };
-
-  const mouseParallaxAllowed = () => !reducedMotion && !mobileQuery.matches && pointerFineQuery.matches;
-
-  const clearGsapMouseParallax = () => {
-    if (!window.gsap || gsapMouseTargets.length === 0) {
-      gsapMouseTargets = [];
-      return;
-    }
-
-    gsapMouseTargets.forEach((target) => {
-      target.qx(0);
-      target.qy(0);
-    });
-    gsapMouseTargets = [];
-  };
-
-  // Desktop-only mouse parallax layers xPercent/yPercent on top of scroll-based transforms.
-  const buildGsapMouseParallax = () => {
-    clearGsapMouseParallax();
-
-    if (!window.gsap || !mouseParallaxAllowed() || engine !== "gsap") {
-      return;
-    }
-
-    const gsap = window.gsap;
-    const targets = [];
-
-    parallaxItems.forEach((item, idx) => {
-      const config = getParallaxConfig(item, idx);
-      targets.push({
-        qx: gsap.quickTo(item, "xPercent", { duration: 0.45, ease: "power2.out" }),
-        qy: gsap.quickTo(item, "yPercent", { duration: 0.45, ease: "power2.out" }),
-        xStrength: config.axis.includes("x") ? config.amount * 0.28 * config.sign : 0,
-        yStrength: config.axis.includes("y") ? config.amount * 0.24 * -config.sign : 0
-      });
-    });
-
-    if (heroPortrait) {
-      targets.push({
-        qx: gsap.quickTo(heroPortrait, "xPercent", { duration: 0.45, ease: "power2.out" }),
-        qy: gsap.quickTo(heroPortrait, "yPercent", { duration: 0.45, ease: "power2.out" }),
-        xStrength: 4,
-        yStrength: 3
-      });
-    }
-
-    collageImages.forEach((image, idx) => {
-      targets.push({
-        qx: gsap.quickTo(image, "xPercent", { duration: 0.45, ease: "power2.out" }),
-        qy: gsap.quickTo(image, "yPercent", { duration: 0.45, ease: "power2.out" }),
-        xStrength: (idx % 2 ? -1 : 1) * 4.6,
-        yStrength: (idx % 2 ? 1 : -1) * 3.2
-      });
-    });
-
-    gsapMouseTargets = targets;
-  };
-
-  const applyGsapMouseParallax = () => {
-    if (!mouseParallaxAllowed() || engine !== "gsap") return;
-    if (gsapMouseTargets.length === 0) {
-      buildGsapMouseParallax();
-    }
-
-    gsapMouseTargets.forEach((target) => {
-      target.qx(mouseState.x * target.xStrength);
-      target.qy(mouseState.y * target.yStrength);
-    });
-  };
-
-  const queueMouseParallaxUpdate = () => {
-    if (mouseRaf) return;
-
-    mouseRaf = window.requestAnimationFrame(() => {
-      mouseRaf = 0;
-
-      if (engine === "gsap") {
-        applyGsapMouseParallax();
-        return;
-      }
-
-      if (engine === "native" && nativeState.requestRender) {
-        nativeState.requestRender();
-      }
-    });
-  };
-
-  const resetMouseParallax = () => {
-    mouseState.x = 0;
-    mouseState.y = 0;
-
-    if (engine === "gsap") {
-      applyGsapMouseParallax();
-    } else if (engine === "native" && nativeState.requestRender) {
-      nativeState.requestRender();
-    }
-  };
-
-  const handleMouseMove = (event) => {
-    if (!mouseParallaxAllowed()) return;
-
-    const nx = clamp((event.clientX / Math.max(1, window.innerWidth)) * 2 - 1, -1, 1);
-    const ny = clamp((event.clientY / Math.max(1, window.innerHeight)) * 2 - 1, -1, 1);
-    mouseState.x = nx;
-    mouseState.y = ny;
-    queueMouseParallaxUpdate();
   };
 
   const setupImageFallbacks = () => {
@@ -875,8 +763,6 @@
     } else {
       track.style.transform = "";
     }
-
-    clearGsapMouseParallax();
   };
 
   const stopNativeHorizontal = () => {
@@ -901,7 +787,6 @@
     nativeState.maxX = 0;
     nativeState.currentX = 0;
     nativeState.targetX = 0;
-    nativeState.requestRender = null;
 
     body.classList.remove("native-horizontal");
     body.style.height = "";
@@ -910,31 +795,24 @@
 
   const updateNativeParallax = (y, maxX) => {
     const ratio = maxX > 0 ? y / maxX : 0;
-    const mouseFactorX = mouseParallaxAllowed() ? mouseState.x : 0;
-    const mouseFactorY = mouseParallaxAllowed() ? mouseState.y : 0;
 
     parallaxItems.forEach((item, idx) => {
       const config = getParallaxConfig(item, idx);
-      const scrollDx = config.axis.includes("x") ? ratio * config.amount * 1.35 * config.sign : 0;
-      const scrollDy = config.axis.includes("y") ? ratio * config.amount * 0.95 * -config.sign : 0;
-      const mouseDx = config.axis.includes("x") ? mouseFactorX * config.amount * 0.35 : 0;
-      const mouseDy = config.axis.includes("y") ? mouseFactorY * config.amount * 0.28 : 0;
-      const dx = scrollDx + mouseDx;
-      const dy = scrollDy + mouseDy;
-      const scale = item.classList.contains("panel-media") ? 1.05 + ratio * 0.14 : 1;
+      const dx = config.axis.includes("x") ? ratio * config.amount * 1.08 * config.sign : 0;
+      const dy = config.axis.includes("y") ? ratio * config.amount * 0.74 * -config.sign : 0;
+      const scale = item.classList.contains("panel-media") ? 1.03 + ratio * 0.08 : 1;
       item.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
     });
 
     if (heroPortrait) {
-      const scale = 1.03 + ratio * 0.09;
-      const x = ratio * 22 + mouseFactorX * 12;
-      const yOffset = mouseFactorY * 8;
-      heroPortrait.style.transform = `translate3d(${x}px, ${yOffset}px, 0) scale(${scale})`;
+      const scale = 1.02 + ratio * 0.05;
+      const x = ratio * 12;
+      heroPortrait.style.transform = `translate3d(${x}px, 0, 0) scale(${scale})`;
     }
 
     collageImages.forEach((image, idx) => {
-      const driftX = (idx % 2 ? -1 : 1) * ratio * 20 + mouseFactorX * (idx % 2 ? -8 : 8);
-      const driftY = (idx % 2 ? 1 : -1) * ratio * 8 + mouseFactorY * (idx % 2 ? 6 : -6);
+      const driftX = (idx % 2 ? -1 : 1) * ratio * 10;
+      const driftY = (idx % 2 ? 1 : -1) * ratio * 4;
       image.style.transform = `translate3d(${driftX}px, ${driftY}px, 0)`;
     });
   };
@@ -947,7 +825,6 @@
 
     body.classList.remove("reduced-motion");
     body.classList.add("native-horizontal");
-    clearGsapMouseParallax();
 
     const updateMetrics = () => {
       nativeState.maxX = Math.max(0, track.scrollWidth - window.innerWidth);
@@ -993,7 +870,6 @@
       updateMetrics();
       requestRender();
     };
-    nativeState.requestRender = requestRender;
 
     updateMetrics();
 
@@ -1170,12 +1046,12 @@
       if (!panel) return;
 
       const config = getParallaxConfig(item, idx);
-      const fromX = config.axis.includes("x") ? -config.sign * config.amount * 0.52 : 0;
-      const toX = config.axis.includes("x") ? config.sign * config.amount * 1.32 : 0;
-      const fromY = config.axis.includes("y") ? config.sign * config.amount * 0.36 : 0;
-      const toY = config.axis.includes("y") ? -config.sign * config.amount * 1.18 : 0;
-      const fromScale = item.classList.contains("panel-media") ? 1.04 : 1;
-      const toScale = item.classList.contains("panel-media") ? 1.18 : 1;
+      const fromX = config.axis.includes("x") ? -config.sign * config.amount * 0.28 : 0;
+      const toX = config.axis.includes("x") ? config.sign * config.amount * 0.92 : 0;
+      const fromY = config.axis.includes("y") ? config.sign * config.amount * 0.2 : 0;
+      const toY = config.axis.includes("y") ? -config.sign * config.amount * 0.84 : 0;
+      const fromScale = item.classList.contains("panel-media") ? 1.03 : 1;
+      const toScale = item.classList.contains("panel-media") ? 1.1 : 1;
 
       gsap.fromTo(
         item,
@@ -1203,8 +1079,6 @@
     }
 
     engine = "gsap";
-    buildGsapMouseParallax();
-    applyGsapMouseParallax();
     console.log("[soundtrack] engine=gsap motion=%s distanceX=%d", motionSetting, distanceX());
     updateDebugOverlay();
     return true;
@@ -1214,7 +1088,6 @@
     stopLenis();
     killGsapHorizontal();
     stopNativeHorizontal();
-    clearGsapMouseParallax();
 
     body.classList.add("reduced-motion");
     clearParallaxStyles();
@@ -1433,27 +1306,6 @@
     mobileQuery.addListener(onMotionMediaChange);
   }
 
-  if (typeof pointerFineQuery.addEventListener === "function") {
-    pointerFineQuery.addEventListener("change", () => {
-      if (!pointerFineQuery.matches) {
-        resetMouseParallax();
-      } else {
-        queueMouseParallaxUpdate();
-      }
-    });
-  } else if (typeof pointerFineQuery.addListener === "function") {
-    pointerFineQuery.addListener(() => {
-      if (!pointerFineQuery.matches) {
-        resetMouseParallax();
-      } else {
-        queueMouseParallaxUpdate();
-      }
-    });
-  }
-
-  window.addEventListener("mousemove", handleMouseMove, { passive: true });
-  window.addEventListener("mouseleave", resetMouseParallax);
-
   window.addEventListener("resize", () => {
     if (engine === "gsap" && window.ScrollTrigger) {
       window.ScrollTrigger.refresh();
@@ -1471,7 +1323,6 @@
     }
 
     updateDebugOverlay();
-    queueMouseParallaxUpdate();
   });
 
   window.addEventListener("load", () => {
@@ -1508,7 +1359,6 @@
 
     buildRailTimeline();
     initializeEngine();
-    queueMouseParallaxUpdate();
     console.log("GSAP", !!window.gsap, "ST", !!window.ScrollTrigger, "Lenis", !!window.Lenis);
   };
 

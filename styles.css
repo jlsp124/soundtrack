@@ -1,6 +1,6 @@
 :root {
   --rail-collapsed: 72px;
-  --rail-expanded: 332px;
+  --rail-expanded: 348px;
   --rail-accent: #e8e8ea;
   --accent: #d9d9dd;
   --font-display: "Bebas Neue", sans-serif;
@@ -21,6 +21,8 @@
   --tf-teal: #0f3a4a;
   --tf-navy: #081426;
   --tf-gold: #d6a244;
+  --gm-flow-gradient: linear-gradient(140deg, #2a158f 0%, #6a43eb 52%, #ff51ae 100%);
+  --tf-flow-gradient: linear-gradient(150deg, #08111f 0%, #0f2a3d 52%, #154455 100%);
 
   --ease: cubic-bezier(0.2, 0.78, 0.16, 1);
 }
@@ -248,7 +250,7 @@ body.rail-open .rail-title {
   margin-top: 6px;
   width: 100%;
   display: grid;
-  gap: 4px;
+  gap: 8px;
   padding-right: 2px;
   align-content: start;
   overflow: hidden;
@@ -256,7 +258,7 @@ body.rail-open .rail-title {
 
 .rail-group {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
-  padding-top: 4px;
+  padding-top: 8px;
 }
 
 .rail-item {
@@ -280,14 +282,12 @@ body.rail-open .rail-title {
 }
 
 body.rail-open .rail-item {
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
+  font-size: 0.84rem;
+  letter-spacing: 0.11em;
   padding-left: 7px;
   padding-right: 16px;
-  line-height: 1.12;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  line-height: 1.2;
+  white-space: nowrap;
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
@@ -336,9 +336,9 @@ body.rail-open .rail-subnav {
   color: rgba(248, 248, 248, 0.72);
   text-align: left;
   font-family: var(--font-body);
-  font-size: 0.62rem;
-  line-height: 1.16;
-  padding: 3px 8px 3px 10px;
+  font-size: 0.74rem;
+  line-height: 1.28;
+  padding: 5px 8px 5px 12px;
   white-space: normal;
   word-break: break-word;
   cursor: pointer;
@@ -423,7 +423,7 @@ body.rail-open .rail-subnav {
 }
 
 .theme-gm {
-  background: linear-gradient(142deg, #29128a 0%, #6b41e8 48%, #ff4fae 100%);
+  background: var(--gm-flow-gradient);
   color: var(--gm-cream);
 }
 
@@ -439,13 +439,24 @@ body.rail-open .rail-subnav {
 
 .theme-tf-intro {
   background: radial-gradient(circle at 76% 26%, rgba(214, 162, 68, 0.24), transparent 44%),
-    linear-gradient(152deg, #08111f 0%, #0f2a3d 52%, #154455 100%);
+    var(--tf-flow-gradient);
   color: #eef5f8;
 }
 
 .theme-tf {
   background: radial-gradient(circle at 76% 26%, rgba(214, 162, 68, 0.2), transparent 44%),
-    linear-gradient(152deg, #08111f 0%, #0f2a3d 52%, #154455 100%);
+    var(--tf-flow-gradient);
+  color: #edf3f6;
+}
+
+/* Keep chapter backgrounds continuous so adjacent panels read like one long gradient. */
+.panel[data-chapter="good-morning"] {
+  background: radial-gradient(circle at 78% 30%, rgba(255, 183, 3, 0.16), transparent 44%), var(--gm-flow-gradient) !important;
+  color: var(--gm-cream);
+}
+
+.panel[data-chapter="take-five"] {
+  background: radial-gradient(circle at 76% 26%, rgba(214, 162, 68, 0.18), transparent 44%), var(--tf-flow-gradient) !important;
   color: #edf3f6;
 }
 
@@ -1241,7 +1252,7 @@ body.reduced-motion .reveal-media {
 @media (max-width: 900px) {
   :root {
     --rail-collapsed: 56px;
-    --rail-expanded: min(92vw, 300px);
+    --rail-expanded: min(92vw, 316px);
   }
 
   .side-rail {
@@ -1266,11 +1277,11 @@ body.reduced-motion .reveal-media {
   }
 
   body.rail-open .rail-item {
-    font-size: 0.64rem;
+    font-size: 0.72rem;
   }
 
   .rail-subitem {
-    font-size: 0.58rem;
+    font-size: 0.64rem;
   }
 
   .chapter-support {
