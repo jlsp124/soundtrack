@@ -8,8 +8,8 @@ ALLOWED_ORIGINS = "https://jlsp124.github.io,http://127.0.0.1:5500"
 [[d1_databases]]
 binding = "DB"
 database_name = "soundtrack-comments"
-database_id = "__D1_DATABASE_ID__"
+database_id = "a886b015-c528-4e2f-8cc9-f013c3b5865b"
 
 [[kv_namespaces]]
-binding = "RATE_LIMIT"
-id = "__KV_NAMESPACE_ID__"
+binding = "SOUNDTRACK_RATE_LIMIT"
+id = "dc017571e8c0418fb316238d9eafb68e"
