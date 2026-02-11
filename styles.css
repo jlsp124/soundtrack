@@ -205,6 +205,11 @@ body.rail-open .rail-btn .icon-close {
 .rail-title {
   display: block;
   white-space: nowrap;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 0.28em;
   font-size: 0.62rem;
@@ -268,9 +273,9 @@ body.rail-open .rail-title {
   text-align: left;
   padding: 6px 10px 6px 2px;
   cursor: pointer;
-  opacity: 0;
-  transform: translateX(-10px);
-  pointer-events: none;
+  opacity: 1;
+  transform: translateY(8px);
+  pointer-events: auto;
   transition: color 0.3s var(--ease), background 0.3s var(--ease), font-size 0.3s var(--ease), letter-spacing 0.3s var(--ease), padding 0.3s var(--ease), opacity 0.3s var(--ease), transform 0.3s var(--ease);
 }
 
@@ -279,7 +284,7 @@ body.rail-open .rail-item {
   letter-spacing: 0.11em;
   padding-left: 7px;
   opacity: 1;
-  transform: translateX(0);
+  transform: translateY(0);
   pointer-events: auto;
 }
 
@@ -557,7 +562,8 @@ body.rail-open .rail-subnav {
 .panel-figure img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
 }
 
 .panel-figure.contain-media {
@@ -955,11 +961,12 @@ body[data-rubric="on"] .rubric-chip {
 .sources-thumbs img {
   width: calc(50% - 5px);
   aspect-ratio: 16 / 9;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 8px;
   border: 1px solid rgba(20, 21, 29, 0.16);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
   opacity: 0.88;
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .panel-comments {

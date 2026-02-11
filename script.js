@@ -9,6 +9,7 @@
 
   const sideRail = document.getElementById("sideRail");
   const menuToggle = document.getElementById("menuToggle");
+  const railHome = document.getElementById("railHome");
   const progressFill = document.getElementById("edgeProgressFill");
 
   const railItems = Array.from(document.querySelectorAll(".rail-item"));
@@ -56,8 +57,9 @@
   const debugEnabled = new URLSearchParams(window.location.search).get("debug") === "1";
   const COMMENTS_LIMIT = 20;
   const COMMENTS_COOLDOWN_MS = 10000;
-  const commentsApiBase = (commentsApiMeta?.content || "").trim().replace(/\/+$/, "");
-  const commentsConfigured = commentsApiBase !== "" && !/FILL_ME/i.test(commentsApiBase);
+  const commentsApiRaw = (commentsApiMeta?.content || "").trim().replace(/\/+$/, "");
+  const commentsApiBase = commentsApiRaw.replace(/\/api$/i, "");
+  const commentsConfigured = commentsApiBase !== "" && !/FILL_ME|YOUR_WORKER|example\.com/i.test(commentsApiRaw);
 
   const reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -428,6 +430,15 @@
     });
   };
 
+  const renderCommentsLoading = () => {
+    if (!commentsList) return;
+    commentsList.textContent = "";
+    const loading = document.createElement("li");
+    loading.className = "comment-empty comment-loading";
+    loading.textContent = "Loading comments...";
+    commentsList.appendChild(loading);
+  };
+
   const updateCommentsSubmitState = () => {
     if (!commentsSubmit) return;
     const remainingMs = Math.max(0, commentsCooldownUntil - Date.now());
@@ -466,6 +477,8 @@
     if (!commentsConfigured || !commentsList) return;
 
     try {
+      renderCommentsLoading();
+      setCommentsStatus("Loading comments...", "");
       const response = await window.fetch(commentsUrl(`/api/comments?limit=${COMMENTS_LIMIT}`), {
         method: "GET"
       });
@@ -492,7 +505,10 @@
     renderComments([]);
 
     if (!commentsConfigured) {
-      setCommentsStatus("Comments not configured.", "error");
+      if (commentsConfigMsg) {
+        commentsConfigMsg.textContent = "Comments are not configured for this deployment yet.";
+      }
+      setCommentsStatus("Add a valid comments-api meta value to enable posting.", "error");
       [commentName, commentMessage, commentWebsite, commentsSubmit].forEach((field) => {
         if (field) field.disabled = true;
       });
@@ -953,10 +969,18 @@
       });
     };
 
-    const reset = (panel) => {
+    const animateOut = (panel, direction = 1) => {
       const targets = revealTargets.get(panel) || [];
       if (targets.length === 0) return;
-      gsap.set(targets, { autoAlpha: 0, y: 28 });
+      gsap.killTweensOf(targets);
+      gsap.to(targets, {
+        autoAlpha: 0,
+        y: direction > 0 ? -18 : 18,
+        duration: 0.42,
+        ease: "power1.in",
+        stagger: 0.04,
+        overwrite: true
+      });
     };
 
     animateIn(panels[0]);
@@ -969,8 +993,9 @@
         start: "left 70%",
         end: "right 30%",
         onEnter: () => animateIn(panel),
+        onLeave: () => animateOut(panel, 1),
         onEnterBack: () => animateIn(panel),
-        onLeaveBack: () => reset(panel)
+        onLeaveBack: () => animateOut(panel, -1)
       });
     });
 
@@ -1142,7 +1167,7 @@
       railTimeline = null;
     }
 
-    gsap.set(railItems, { autoAlpha: 0, x: -10 });
+    gsap.set(railItems, { autoAlpha: 0.72, y: 8 });
     gsap.set(subItems, { autoAlpha: 0, y: 12 });
 
     // Single timeline controls both open and close for perfectly matched timing.
@@ -1161,12 +1186,12 @@
         railItems,
         {
           autoAlpha: 1,
-          x: 0,
+          y: 0,
           stagger: 0.03,
-          duration: 0.28,
+          duration: 0.32,
           ease: "power2.out"
         },
-        0.12
+        0.1
       )
       .to(
         subItems,
@@ -1194,11 +1219,13 @@
       }
 
       window.gsap.set(sideRail, { width: collapsedRailWidth() });
+      window.gsap.set(railItems, { autoAlpha: 0.72, y: 8 });
+      window.gsap.set(subItems, { autoAlpha: 0, y: 12 });
       railTimeline?.play(0);
     } else {
       railItems.forEach((item) => {
         item.style.opacity = "1";
-        item.style.transform = "translateX(0)";
+        item.style.transform = "translateY(0)";
       });
       subItems.forEach((item) => {
         item.style.opacity = "1";
@@ -1239,6 +1266,12 @@
   });
 
   menuToggle?.addEventListener("click", toggleRail);
+  railHome?.addEventListener("click", () => {
+    jumpToIndex(0);
+    if (body.classList.contains("rail-open")) {
+      closeRail();
+    }
+  });
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && body.classList.contains("rail-open")) {
@@ -1270,7 +1303,7 @@
     if (body.classList.contains("rail-open") && window.gsap) {
       buildRailTimeline();
       window.gsap.set(sideRail, { width: expandedRailWidth() });
-      window.gsap.set(railItems, { autoAlpha: 1, x: 0 });
+      window.gsap.set(railItems, { autoAlpha: 1, y: 0 });
       window.gsap.set(subItems, { autoAlpha: 1, y: 0 });
     }
 
