@@ -246,6 +246,58 @@ body.rail-open .rail-title {
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
 }
 
+.mobile-burger {
+  display: none;
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  border-radius: 10px;
+  background: rgba(9, 10, 14, 0.8);
+  color: #f6f6f6;
+  width: 44px;
+  height: 44px;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: grid;
+  align-items: start;
+  padding: 74px 16px 16px;
+  background: rgba(7, 8, 13, 0.7);
+  backdrop-filter: blur(5px);
+}
+
+.mobile-menu[hidden] {
+  display: none;
+}
+
+.mobile-menu-nav {
+  width: min(86vw, 340px);
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  background: rgba(9, 10, 14, 0.95);
+  padding: 12px;
+}
+
+.mobile-menu-link {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #f5f6fb;
+  text-align: left;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 0.94rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
 .rail-groups {
   margin-top: 6px;
   width: 100%;
@@ -1254,38 +1306,45 @@ body.reduced-motion .reveal-media {
 }
 
 @media (max-width: 900px) {
-  :root {
-    --rail-collapsed: 64px;
-    --rail-expanded: min(92vw, 340px);
+  .side-rail,
+  .rail,
+  #sideRail {
+    display: none !important;
   }
 
-  .side-rail {
-    padding: 10px 8px 12px;
+  .mobile-burger {
+    display: block;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 9999;
   }
 
-  .rail-btn {
-    width: 42px;
-    height: 42px;
+  body.mobile-mode #horizontalShell {
+    position: static;
+    height: auto;
+    overflow: visible;
   }
 
-  .rail-btn img {
-    width: 20px;
-    height: 20px;
+  body.mobile-mode #horizontalTrack {
+    display: block;
+    transform: none !important;
+    width: auto;
+    height: auto;
+    position: static;
   }
 
-  .panel,
-  .panel-wide {
-    width: 100vw;
-    flex-basis: 100vw;
-    padding: clamp(18px, 4vw, 30px) clamp(12px, 4vw, 20px) clamp(16px, 4vw, 26px) calc(var(--rail-collapsed) + 12px);
+  body.mobile-mode .panel,
+  body.mobile-mode .panel-wide {
+    width: auto;
+    height: auto;
+    min-height: 0;
+    flex-basis: auto;
+    padding: clamp(18px, 4vw, 30px) clamp(14px, 4vw, 20px) clamp(16px, 4vw, 26px);
   }
 
-  body.rail-open .rail-item {
-    font-size: 0.72rem;
-  }
-
-  .rail-subitem {
-    font-size: 0.64rem;
+  body.mobile-mode .panel:first-child {
+    padding-top: 72px;
   }
 
   .chapter-support {
@@ -1298,6 +1357,23 @@ body.reduced-motion .reveal-media {
 
   .comments-wrap {
     width: min(94vw, 700px);
+  }
+
+  body.mobile-mode .comments-card input,
+  body.mobile-mode .comments-card textarea,
+  body.mobile-mode .comments-card button,
+  body.mobile-mode .comments-form input,
+  body.mobile-mode .comments-form textarea,
+  body.mobile-mode .comments-form button {
+    width: 100%;
+  }
+
+  body.mobile-mode .comments-list-wrap,
+  body.mobile-mode .comments-list,
+  body.mobile-mode .comment-item,
+  body.mobile-mode .comment-message {
+    max-width: 100%;
+    overflow-wrap: anywhere;
   }
 }
 
