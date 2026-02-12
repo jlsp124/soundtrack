@@ -11,10 +11,13 @@
   const menuToggle = document.getElementById("menuToggle");
   const railHome = document.getElementById("railHome");
   const progressFill = document.getElementById("edgeProgressFill");
+  const mobileBurger = document.getElementById("mobileBurger");
+  const mobileMenu = document.getElementById("mobileMenu");
 
   const railItems = Array.from(document.querySelectorAll(".rail-item"));
   const subItems = Array.from(document.querySelectorAll(".rail-subitem"));
   const jumpLinks = [...railItems, ...subItems];
+  const mobileMenuLinks = Array.from(document.querySelectorAll(".mobile-menu-link"));
 
   const commentsList = document.getElementById("commentsList");
   const commentsForm = document.getElementById("commentsForm");
@@ -66,6 +69,7 @@
 
   let motionSetting = "on";
   let reducedMotion = false;
+  let mobileMode = mobileQuery.matches;
   let engine = "none";
 
   let masterTween = null;
@@ -1263,6 +1267,40 @@
     }
   };
 
+  const closeMobileMenu = () => {
+    if (!mobileMenu || !mobileBurger) return;
+    mobileMenu.hidden = true;
+    mobileBurger.setAttribute("aria-expanded", "false");
+  };
+
+  const openMobileMenu = () => {
+    if (!mobileMenu || !mobileBurger || !mobileMode) return;
+    mobileMenu.hidden = false;
+    mobileBurger.setAttribute("aria-expanded", "true");
+  };
+
+  const toggleMobileMenu = () => {
+    if (!mobileMenu || !mobileBurger || !mobileMode) return;
+    if (mobileMenu.hidden) {
+      openMobileMenu();
+    } else {
+      closeMobileMenu();
+    }
+  };
+
+  const setMobileMode = (on) => {
+    mobileMode = !!on;
+    body.classList.toggle("mobile-mode", mobileMode);
+
+    if (!mobileMode) {
+      closeMobileMenu();
+      return;
+    }
+
+    closeRail();
+    closeMobileMenu();
+  };
+
   jumpLinks.forEach((button) => {
     button.addEventListener("click", () => {
       jumpToIndex(button.dataset.index || button.dataset.targetIndex || "0");
@@ -1272,7 +1310,15 @@
     });
   });
 
+  mobileMenuLinks.forEach((button) => {
+    button.addEventListener("click", () => {
+      jumpToIndex(button.dataset.targetIndex || button.dataset.index || "0");
+      closeMobileMenu();
+    });
+  });
+
   menuToggle?.addEventListener("click", toggleRail);
+  mobileBurger?.addEventListener("click", toggleMobileMenu);
   railHome?.addEventListener("click", () => {
     jumpToIndex(0);
     if (body.classList.contains("rail-open")) {
@@ -1284,12 +1330,20 @@
     if (event.key === "Escape" && body.classList.contains("rail-open")) {
       closeRail();
     }
+
+    if (event.key === "Escape" && mobileMode) {
+      closeMobileMenu();
+    }
+  });
+
+  mobileMenu?.addEventListener("click", (event) => {
+    if (event.target === mobileMenu) {
+      closeMobileMenu();
+    }
   });
 
   const onMotionMediaChange = () => {
-    if (mobileQuery.matches && body.classList.contains("rail-open")) {
-      closeRail();
-    }
+    setMobileMode(mobileQuery.matches);
     reducedMotion = computeReducedMotion();
     initializeEngine();
   };
@@ -1353,6 +1407,7 @@
 
     setActiveNav(0);
     updateProgressBar(0);
+    setMobileMode(mobileQuery.matches);
 
     await waitForImages();
     tuneLandingMedia();
