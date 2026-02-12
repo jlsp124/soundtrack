@@ -1,5 +1,5 @@
 :root {
-  --rail-collapsed: 72px;
+  --rail-collapsed: 86px;
   --rail-expanded: 372px;
   --rail-accent: #e8e8ea;
   --accent: #d9d9dd;
@@ -268,12 +268,12 @@ body.rail-open .rail-title {
   background: transparent;
   color: rgba(246, 246, 246, 0.7);
   text-transform: uppercase;
-  letter-spacing: 0.07em;
-  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  font-size: 0.56rem;
   font-weight: 700;
   line-height: 1.2;
   text-align: left;
-  padding: 6px 10px 6px 2px;
+  padding: 6px 6px 6px 2px;
   cursor: pointer;
   opacity: 1;
   transform: translateY(8px);
@@ -306,7 +306,7 @@ body.rail-open .rail-item.is-active {
   color: var(--rail-accent, var(--accent));
 }
 
-.rail-item.is-active::after {
+body.rail-open .rail-item.is-active::after {
   content: "/";
   position: absolute;
   right: 10px;
@@ -1255,7 +1255,7 @@ body.reduced-motion .reveal-media {
 
 @media (max-width: 900px) {
   :root {
-    --rail-collapsed: 56px;
+    --rail-collapsed: 64px;
     --rail-expanded: min(92vw, 340px);
   }
 
