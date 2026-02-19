@@ -75,6 +75,8 @@
   let masterTween = null;
   let masterTrigger = null;
   let observer = null;
+  const managedScrollTriggers = [];
+  const mobilePanelTimelines = [];
 
   let lenis = null;
   let lenisTicker = null;
@@ -139,10 +141,35 @@
   };
 
   const computeReducedMotion = () => {
-    if (mobileQuery.matches) return true;
     if (motionSetting === "on") return false;
     if (motionSetting === "off") return true;
     return reduceQuery.matches;
+  };
+
+  const registerManagedTrigger = (trigger) => {
+    if (trigger) managedScrollTriggers.push(trigger);
+  };
+
+  const clearManagedTriggers = () => {
+    managedScrollTriggers.splice(0).forEach((trigger) => {
+      trigger?.kill?.();
+    });
+  };
+
+  const clearMobilePanelAnimations = () => {
+    mobilePanelTimelines.splice(0).forEach((timeline) => {
+      timeline?.scrollTrigger?.kill?.();
+      timeline?.kill?.();
+    });
+
+    panels.forEach((panel) => {
+      const nodes = panel.querySelectorAll(".anim-heading, .paper-card, .media-card, .accent-line");
+      nodes.forEach((node) => {
+        node.style.opacity = "";
+        node.style.visibility = "";
+        node.style.transform = "";
+      });
+    });
   };
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -511,10 +538,12 @@
     renderComments([]);
 
     if (!commentsConfigured) {
-      if (commentsConfigMsg) {
-        commentsConfigMsg.textContent = "Comments are not configured for this deployment yet.";
-      }
-      setCommentsStatus("Add a valid comments-api meta value to enable posting.", "error");
+      const commentsPanel = document.querySelector(".panel-comments");
+      commentsPanel?.setAttribute("hidden", "hidden");
+      document.querySelectorAll('[data-target-index="17"], [data-index="17"]').forEach((node) => {
+        node.setAttribute("hidden", "hidden");
+      });
+      if (commentsConfigMsg) commentsConfigMsg.hidden = true;
       [commentName, commentMessage, commentWebsite, commentsSubmit].forEach((field) => {
         if (field) field.disabled = true;
       });
@@ -757,10 +786,8 @@
     }
 
     masterTrigger = null;
-
-    if (window.ScrollTrigger) {
-      window.ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    }
+    clearManagedTriggers();
+    clearMobilePanelAnimations();
 
     if (window.gsap) {
       window.gsap.set(track, { clearProps: "transform" });
@@ -998,7 +1025,7 @@
 
     // Panel entry animations are tied to the horizontal master so elements arrive as each panel enters view.
     panels.forEach((panel) => {
-      ScrollTrigger.create({
+      const trigger = ScrollTrigger.create({
         trigger: panel,
         containerAnimation: masterTween,
         start: "left 70%",
@@ -1008,10 +1035,11 @@
         onEnterBack: () => animateIn(panel),
         onLeaveBack: () => animateOut(panel, -1)
       });
+      registerManagedTrigger(trigger);
     });
 
     Array.from(document.querySelectorAll(".anim-line")).forEach((line, idx) => {
-      gsap.from(line, {
+      const tween = gsap.from(line, {
         scaleX: 0,
         autoAlpha: 0,
         duration: 0.82,
@@ -1024,10 +1052,11 @@
           toggleActions: "play none none reverse"
         }
       });
+      registerManagedTrigger(tween.scrollTrigger);
     });
 
     Array.from(document.querySelectorAll(".reveal-media")).forEach((item) => {
-      gsap.fromTo(
+      const tween = gsap.fromTo(
         item,
         { clipPath: "inset(0 0 100% 0)" },
         {
@@ -1043,6 +1072,7 @@
           }
         }
       );
+      registerManagedTrigger(tween.scrollTrigger);
     });
 
     parallaxItems.forEach((item, idx) => {
@@ -1057,7 +1087,7 @@
       const fromScale = item.classList.contains("panel-media") ? 1.03 : 1;
       const toScale = item.classList.contains("panel-media") ? 1.1 : 1;
 
-      gsap.fromTo(
+      const tween = gsap.fromTo(
         item,
         { x: fromX, y: fromY, scale: fromScale },
         {
@@ -1074,6 +1104,7 @@
           }
         }
       );
+      registerManagedTrigger(tween.scrollTrigger);
     });
 
     ScrollTrigger.refresh();
@@ -1105,8 +1136,71 @@
     updateDebugOverlay();
   };
 
+
+  const initMobileMode = () => {
+    stopLenis();
+    killGsapHorizontal();
+    stopNativeHorizontal();
+    clearParallaxStyles();
+    attachVerticalObserver();
+    attachVerticalProgress();
+    body.classList.remove("reduced-motion");
+
+    if (!window.gsap || !window.ScrollTrigger || reducedMotion) {
+      clearMobilePanelAnimations();
+      engine = "mobile";
+      updateDebugOverlay();
+      return;
+    }
+
+    const gsap = window.gsap;
+    const ScrollTrigger = window.ScrollTrigger;
+
+    clearMobilePanelAnimations();
+
+    panels.forEach((panel) => {
+      const headings = Array.from(panel.querySelectorAll(".anim-heading"));
+      const cards = Array.from(panel.querySelectorAll(".paper-card"));
+      const media = Array.from(panel.querySelectorAll(".media-card"));
+      const lines = Array.from(panel.querySelectorAll(".accent-line"));
+      const targets = [...headings, ...cards, ...media, ...lines];
+      if (!targets.length) return;
+
+      gsap.set(headings, { autoAlpha: 0, y: 12 });
+      gsap.set(cards, { autoAlpha: 0, y: 12 });
+      gsap.set(media, { autoAlpha: 0, x: 12 });
+      gsap.set(lines, { autoAlpha: 0, scaleX: 0, transformOrigin: "left center" });
+
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: panel,
+          start: "top 75%",
+          end: "bottom 25%",
+          toggleActions: "play reverse play reverse"
+        }
+      });
+
+      timeline
+        .to(headings, { autoAlpha: 1, y: 0, duration: 0.32, stagger: 0.04, ease: "power2.out" }, 0)
+        .to(cards, { autoAlpha: 1, y: 0, duration: 0.36, stagger: 0.05, ease: "power2.out" }, 0.04)
+        .to(media, { autoAlpha: 1, x: 0, duration: 0.36, stagger: 0.05, ease: "power2.out" }, 0.08)
+        .to(lines, { autoAlpha: 1, scaleX: 1, duration: 0.38, stagger: 0.04, ease: "power2.out" }, 0.1);
+
+      mobilePanelTimelines.push(timeline);
+    });
+
+    ScrollTrigger.refresh();
+    engine = "mobile";
+    updateDebugOverlay();
+  };
+
   const initializeEngine = () => {
     reducedMotion = computeReducedMotion();
+
+    if (mobileMode) {
+      initMobileMode();
+      return;
+    }
 
     if (reducedMotion) {
       initReducedMode();
