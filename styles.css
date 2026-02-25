@@ -1107,7 +1107,8 @@ body[data-rubric="on"] .rubric-chip {
   display: grid;
   gap: 8px;
   max-height: 420px;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .comment-item {
